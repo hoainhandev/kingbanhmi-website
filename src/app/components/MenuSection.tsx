@@ -1,66 +1,66 @@
 import { Star } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
-import imgBanhMiDacBiet from '@/assets/cae44d3ac6e71b335f975aab2008c9acb433f783.png';
-import imgBanhMiThitNuong from '@/assets/c47278509caa1144977f730c2484a20701c093b7.png';
-import imgBanhMiGaNuong from '@/assets/364b113549d3e976589dc2f8aecb175f0115ef4a.png';
-import imgBanhMiTrungOpLa from '@/assets/4bdf7f27a3c9823abf6616e921e32cdfa1366dbf.png';
-import imgBanhMiXiuMai from '@/assets/0bee3a8c4461cd05bca6d11318a8d3bfdbe979e8.png';
-import imgBanhMiChay from '@/assets/4a9fae5b4532357b6b577a1916dbaa25dd523c2c.png';
+import imgBanhMiDacBiet from '@/assets/banh-mi-dac-biet.jpg';
+import imgBanhMiThitNuong from '@/assets/banh-mi-thit-nuong.jpeg';
+import imgBanhMiGaNuong from '@/assets/banh-mi-heo-quay.jpg';
+import imgBanhMiTrungOpLa from '@/assets/banh-mi-bo-ribeye.jpg';
+import imgBanhMiXiuMai from '@/assets/banh-mi-xiu-mai-bi.png';
+import imgBanhMiChay from '@/assets/banh-mi-cha-ca.jpg';
 
 const menuItems = [
   {
     id: 1,
-    name: 'BÁNH MÌ ĐẶC BIỆT',
-    nameEn: 'King Special',
-    description: 'Vietnamese ham, head cheese, pâté, pickled vegetables, cilantro, and jalapeños',
-    price: '$8.99',
-    image: imgBanhMiDacBiet,
+    name: 'BÁNH MÌ HEO QUAY',
+    nameEn: 'Crispy Pork',
+    description: 'Crispy roasted pork belly, pickled vegetables, cucumber, and cilantro',
+    price: '$9',
+    image: imgBanhMiGaNuong,
     popular: true
   },
   {
     id: 2,
-    name: 'BÁNH MÌ THỊT NƯỚNG',
-    nameEn: 'Grilled Pork',
-    description: 'Marinated grilled pork, pickled vegetables, cucumber, cilantro, and house sauce',
-    price: '$8.99',
-    image: imgBanhMiThitNuong,
+    name: 'BÁNH MÌ ĐẶC BIỆT',
+    nameEn: 'House Special',
+    description: 'Vietnamese ham, head cheese, pâté, pickled vegetables, cilantro, and jalapeños',
+    price: '$8',
+    image: imgBanhMiDacBiet,
     popular: true
   },
   {
     id: 3,
-    name: 'BÁNH MÌ GÀ NƯỚNG',
-    nameEn: 'Grilled Chicken',
-    description: 'Lemongrass grilled chicken, pickled vegetables, cucumber, and cilantro',
-    price: '$8.99',
-    image: imgBanhMiGaNuong,
-    popular: false
-  },
-  {
-    id: 4,
-    name: 'BÁNH MÌ TRỨNG ỐP LA',
-    nameEn: 'Fried Egg',
-    description: 'Fried eggs, pâté, pickled vegetables, cucumber, and cilantro',
-    price: '$7.99',
+    name: 'BÁNH MÌ BÒ RIBEYE',
+    nameEn: 'Ribeye Beef',
+    description: 'Grilled ribeye beef, house sauce, pickled vegetables, cucumber, and cilantro',
+    price: '$9',
     image: imgBanhMiTrungOpLa,
     popular: false
   },
   {
+    id: 4,
+    name: 'BÁNH MÌ THỊT NƯỚNG',
+    nameEn: 'Grilled Pork',
+    description: 'Marinated grilled pork, pickled vegetables, cucumber, cilantro, and house sauce',
+    price: '$8',
+    image: imgBanhMiThitNuong,
+    popular: true
+  },
+  {
     id: 5,
-    name: 'BÁNH MÌ XÍU MẠI',
-    nameEn: 'Meatball',
-    description: 'Vietnamese meatballs in tomato sauce, pickled vegetables, and cilantro',
-    price: '$8.99',
-    image: imgBanhMiXiuMai,
+    name: 'BÁNH MÌ CHẢ CÁ',
+    nameEn: 'Fish Cake',
+    description: 'Fried fish cake, chili sauce, pickled vegetables, cucumber, and cilantro',
+    price: '$9',
+    image: imgBanhMiChay,
     popular: false
   },
   {
     id: 6,
-    name: 'BÁNH MÌ CHAY',
-    nameEn: 'Vegetarian',
-    description: 'Tofu, mushrooms, pickled vegetables, cucumber, and cilantro',
-    price: '$7.99',
-    image: imgBanhMiChay,
+    name: 'BÁNH MÌ XÍU MẠI BÌ',
+    nameEn: 'Meatball Shredded Pork Skin',
+    description: 'Vietnamese meatballs, shredded pork skin, pickled vegetables, and cilantro',
+    price: '$9',
+    image: imgBanhMiXiuMai,
     popular: false
   }
 ];
