@@ -129,7 +129,7 @@ export function Footer() {
               </li>
             </ul>
             <motion.a
-              href="https://www.doordash.com"
+              href="https://order.online/store/-23050694?hideModal=true"
               target="_blank"
               rel="noopener noreferrer"
               className="mt-6 inline-block bg-[#FDB714] text-[#013a0f] px-6 py-2.5 rounded text-sm font-semibold hover:bg-[#e6a612] transition-colors"

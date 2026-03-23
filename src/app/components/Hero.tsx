@@ -101,7 +101,7 @@ export function Hero() {
         >
           {/* DoorDash Order Button */}
           <motion.a
-            href="https://www.doordash.com"
+            href="https://order.online/store/-23050694?hideModal=true"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-[#FDB714] hover:bg-[#e6a612] text-[#1a5633] px-10 py-4 rounded-md text-base font-semibold shadow-2xl relative overflow-hidden group border border-[#FDB714] flex items-center gap-2"
