@@ -173,12 +173,15 @@ function MenuItem({ item, index }) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <motion.div
-      ref={ref}
+    <motion.a
+      href="https://order.online/store/-23050694?hideModal=true"
+      target="_blank"
+      rel="noopener noreferrer"
+      ref={ref as any}
       initial={{ opacity: 0, y: 50 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, delay: index * 0.1 }}
-      className="bg-white border border-[#e5e7eb] overflow-hidden group cursor-pointer rounded-sm"
+      className="bg-white border border-[#e5e7eb] overflow-hidden group cursor-pointer rounded-sm block"
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
       whileHover={{ y: -10, boxShadow: "0 20px 40px rgba(0,0,0,0.1)" }}
@@ -238,6 +241,6 @@ function MenuItem({ item, index }) {
           {item.description}
         </p>
       </div>
-    </motion.div>
+    </motion.a>
   );
 }
