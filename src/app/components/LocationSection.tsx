@@ -4,24 +4,42 @@ import { motion } from 'motion/react';
 const locations = [
   {
     id: 1,
-    name: 'Westminster - Little Saigon',
-    address: '9200 Bolsa Ave, Westminster, CA 92683',
-    phone: '(714) 555-0100',
-    hours: 'Mon-Sun: 7AM - 9PM'
+    name: 'Westminster Saigon',
+    address: '9296 Bolsa Ave, Westminster, CA 92683',
+    phone: '(657) 400-9122',
+    hours: 'Daily: 8 AM - 6:30 PM'
   },
   {
     id: 2,
-    name: 'San Jose',
-    address: '2850 S White Rd, San Jose, CA 95148',
-    phone: '(408) 555-0200',
-    hours: 'Mon-Sun: 7AM - 9PM'
+    name: 'Riverside',
+    address: '',
+    phone: '',
+    hours: '',
+    comingSoon: true
   },
   {
     id: 3,
-    name: 'Houston',
-    address: '11209 Bellaire Blvd, Houston, TX 77072',
-    phone: '(281) 555-0300',
-    hours: 'Mon-Sun: 7AM - 9PM'
+    name: 'Long Beach',
+    address: '',
+    phone: '',
+    hours: '',
+    comingSoon: true
+  },
+  {
+    id: 4,
+    name: 'Chicago',
+    address: '',
+    phone: '',
+    hours: '',
+    comingSoon: true
+  },
+  {
+    id: 5,
+    name: 'Las Vegas',
+    address: '',
+    phone: '',
+    hours: '',
+    comingSoon: true
   }
 ];
 
@@ -101,13 +119,13 @@ export function LocationSection() {
               </motion.a>
               
               <motion.a 
-                href="tel:+18005550100" 
+                href="tel:6574009122" 
                 className="flex items-center space-x-3 border border-white/20 px-6 py-4 hover:border-[#FDB714] hover:bg-[#FDB714] hover:text-[#1a5633] transition-all"
                 whileHover={{ scale: 1.05, y: -3 }}
                 whileTap={{ scale: 0.95 }}
               >
                 <Phone className="w-5 h-5" />
-                <span className="text-base font-semibold">(800) 555-0100</span>
+                <span className="text-base font-semibold">(657) 400-9122</span>
               </motion.a>
             </div>
 
@@ -122,68 +140,97 @@ export function LocationSection() {
 }
 
 function LocationCard({ location, index }) {
+  const isComingSoon = location.comingSoon;
+
   return (
     <motion.div
       className="relative group"
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: index * 0.2 }}
+      transition={{ duration: 0.6, delay: index * 0.1 }}
       viewport={{ once: true }}
       whileHover={{ y: -10 }}
     >
       {/* Card */}
-      <div className="relative bg-white border border-gray-200 p-8 h-full">
-        <h3 className="text-xl font-bold mb-6 text-black tracking-wide">
+      <div className="relative bg-white border border-gray-200 p-8 h-full flex flex-col">
+        {isComingSoon && (
+          <div className="absolute top-4 right-4 bg-[#FDB714] text-[#1a5633] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider z-10">
+            Coming Soon
+          </div>
+        )}
+        <h3 className="text-xl font-bold mb-6 text-black tracking-wide pr-24">
           {location.name}
         </h3>
 
-        <div className="space-y-4 mb-6">
-          <motion.div 
-            className="flex items-start space-x-3"
-            whileHover={{ x: 3 }}
-            transition={{ duration: 0.2 }}
-          >
-            <MapPin className="w-5 h-5 text-[#FDB714] mt-1 flex-shrink-0" />
-            <p className="text-gray-600 text-sm">{location.address}</p>
-          </motion.div>
+        <div className="space-y-4 mb-6 flex-grow">
+          {location.address && (
+            <motion.div 
+              className="flex items-start space-x-3"
+              whileHover={{ x: 3 }}
+              transition={{ duration: 0.2 }}
+            >
+              <MapPin className="w-5 h-5 text-[#FDB714] mt-1 flex-shrink-0" />
+              <p className="text-gray-600 text-sm">{location.address}</p>
+            </motion.div>
+          )}
 
-          <motion.div 
-            className="flex items-center space-x-3"
-            whileHover={{ x: 3 }}
-            transition={{ duration: 0.2 }}
-          >
-            <Phone className="w-5 h-5 text-[#FDB714] flex-shrink-0" />
-            <a href={`tel:${location.phone}`} className="text-gray-600 text-sm hover:text-[#FDB714] transition">
-              {location.phone}
-            </a>
-          </motion.div>
+          {location.phone && (
+            <motion.div 
+              className="flex items-center space-x-3"
+              whileHover={{ x: 3 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Phone className="w-5 h-5 text-[#FDB714] flex-shrink-0" />
+              <a href={`tel:${location.phone}`} className="text-gray-600 text-sm hover:text-[#FDB714] transition">
+                {location.phone}
+              </a>
+            </motion.div>
+          )}
 
-          <motion.div 
-            className="flex items-center space-x-3"
-            whileHover={{ x: 3 }}
-            transition={{ duration: 0.2 }}
-          >
-            <Clock className="w-5 h-5 text-[#FDB714] flex-shrink-0" />
-            <p className="text-gray-600 text-sm">{location.hours}</p>
-          </motion.div>
+          {location.hours && (
+            <motion.div 
+              className="flex items-center space-x-3"
+              whileHover={{ x: 3 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Clock className="w-5 h-5 text-[#FDB714] flex-shrink-0" />
+              <p className="text-gray-600 text-sm">{location.hours}</p>
+            </motion.div>
+          )}
+
+          {isComingSoon && (
+            <div className="flex items-center justify-center h-24">
+               <p className="text-gray-400 font-medium italic">We can't wait to serve you here!</p>
+            </div>
+          )}
         </div>
 
-        <motion.button 
-          className="w-full bg-[#1a5633] text-white py-3 text-sm font-semibold tracking-wider relative overflow-hidden group/button hover:bg-[#FDB714] hover:text-[#1a5633] transition-colors duration-300"
-          whileTap={{ scale: 0.98 }}
-        >
-          <span className="relative z-10 flex items-center justify-center space-x-2">
+        {!isComingSoon ? (
+          <motion.a 
+            href={`https://maps.google.com/?q=${encodeURIComponent(location.address)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full bg-[#1a5633] text-white py-3 text-sm font-semibold tracking-wider relative overflow-hidden group/button hover:bg-[#FDB714] hover:text-[#1a5633] transition-colors duration-300 flex items-center justify-center space-x-2 rounded-sm mt-auto"
+            whileTap={{ scale: 0.98 }}
+          >
             <Navigation className="w-4 h-4" />
             <span>GET DIRECTIONS</span>
-          </span>
-        </motion.button>
+          </motion.a>
+        ) : (
+          <button 
+            disabled
+            className="w-full bg-gray-100 text-gray-400 py-3 text-sm font-semibold tracking-wider relative flex items-center justify-center space-x-2 rounded-sm mt-auto cursor-not-allowed"
+          >
+            <span>COMING SOON</span>
+          </button>
+        )}
 
         {/* Accent line */}
         <motion.div
-          className="absolute top-0 left-0 right-0 h-1 bg-[#FDB714]"
+          className={`absolute top-0 left-0 right-0 h-1 ${isComingSoon ? 'bg-gray-300' : 'bg-[#FDB714]'}`}
           initial={{ scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
-          transition={{ duration: 0.8, delay: index * 0.2 + 0.3 }}
+          transition={{ duration: 0.8, delay: index * 0.1 + 0.3 }}
           viewport={{ once: true }}
         />
       </div>
