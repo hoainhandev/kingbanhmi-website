@@ -114,7 +114,9 @@ export function SpecialOffers() {
               
               <div className="flex flex-col sm:flex-row items-center gap-6 mt-auto">
                 <motion.a 
-                  href="#order"
+                  href="https://order.online/store/-23050694?hideModal=true"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="bg-[#1a5633] text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-[#013a0f] transition-all duration-300 w-full sm:w-auto text-center shadow-[0_8px_20px_rgba(26,86,51,0.3)] hover:shadow-[0_12px_25px_rgba(26,86,51,0.4)]"
                   whileHover={{ y: -3 }}
                   whileTap={{ scale: 0.98 }}
