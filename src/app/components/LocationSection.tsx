@@ -72,10 +72,33 @@ export function LocationSection() {
           </p>
         </motion.div>
 
-        {/* Locations Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          {locations.map((location, index) => (
-            <LocationCard key={location.id} location={location} index={index} />
+        {/* Main Location */}
+        <div className="flex justify-center mb-16">
+          <div className="w-full max-w-xl">
+            {locations.filter(l => !l.comingSoon).map((location, index) => (
+              <LocationCard key={location.id} location={location} index={index} />
+            ))}
+          </div>
+        </div>
+
+        {/* Coming Soon Header */}
+        <motion.div 
+          className="text-center mb-10"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+        >
+          <h3 className="text-2xl font-bold text-gray-800 tracking-wider flex items-center justify-center gap-4">
+            <span className="w-16 h-px bg-gray-300 hidden sm:block"></span>
+            COMING SOON
+            <span className="w-16 h-px bg-gray-300 hidden sm:block"></span>
+          </h3>
+        </motion.div>
+
+        {/* Coming Soon Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-16 max-w-6xl mx-auto">
+          {locations.filter(l => l.comingSoon).map((location, index) => (
+            <ComingSoonCard key={location.id} location={location} index={index} />
           ))}
         </div>
 
@@ -233,6 +256,30 @@ function LocationCard({ location, index }) {
           transition={{ duration: 0.8, delay: index * 0.1 + 0.3 }}
           viewport={{ once: true }}
         />
+      </div>
+    </motion.div>
+  );
+}
+
+function ComingSoonCard({ location, index }: { location: any, index: number }) {
+  return (
+    <motion.div
+      className="relative group h-full"
+      initial={{ opacity: 0, scale: 0.95, y: 30 }}
+      whileInView={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      viewport={{ once: true }}
+      whileHover={{ y: -5 }}
+    >
+      <div className="relative bg-[#f8f9fa] border border-gray-200 p-6 h-full flex flex-col items-center justify-center text-center rounded-xl shadow-sm hover:shadow-md transition-shadow">
+        <div className="absolute top-0 right-0 left-0 h-1.5 bg-gray-300 rounded-t-xl" />
+        <MapPin className="w-8 h-8 text-gray-300 mb-3" />
+        <h3 className="text-lg font-bold mb-3 text-gray-800 tracking-wide">
+          {location.name}
+        </h3>
+        <span className="bg-[#FDB714] text-[#1a5633] text-[10px] sm:text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+          Coming Soon
+        </span>
       </div>
     </motion.div>
   );

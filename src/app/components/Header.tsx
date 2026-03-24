@@ -113,13 +113,13 @@ export function Header() {
             transition={{ duration: 0.5, delay: 0.4 }}
           >
             <motion.a 
-              href="tel:+12129120000" 
+              href="tel:6574009122" 
               className="flex items-center space-x-2 bg-[#FCAF15] text-[#0a0a0a] px-4 py-2.5 rounded hover:bg-[#e6a612] transition-colors"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               <Phone className="w-4 h-4" />
-              <span className="font-medium text-sm">(212) 912-0000</span>
+              <span className="font-medium text-sm">(657) 400-9122</span>
             </motion.a>
           </motion.div>
 
@@ -212,7 +212,7 @@ export function Header() {
               </motion.div>
               
               <motion.a 
-                href="tel:+12129120000" 
+                href="tel:6574009122" 
                 className="flex items-center space-x-2 py-2 text-white hover:text-[#FCAF15] transition-colors text-sm font-medium"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -220,7 +220,7 @@ export function Header() {
                 whileHover={{ x: 5 }}
               >
                 <Phone className="w-4 h-4" />
-                <span>(212) 912-0000</span>
+                <span>(657) 400-9122</span>
               </motion.a>
             </motion.nav>
           )}
