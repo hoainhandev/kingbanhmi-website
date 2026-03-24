@@ -81,17 +81,17 @@ export function Footer() {
               <li className="flex items-start space-x-3">
                 <MapPin className="w-5 h-5 text-[#FDB714] mt-0.5 flex-shrink-0" />
                 <span className="text-gray-300 text-sm">
-                  123 Saigon Street<br />
-                  New York, NY 10001
+                  9296 Bolsa Ave<br />
+                  Westminster, CA 92683
                 </span>
               </li>
               <li className="flex items-center space-x-3">
                 <Phone className="w-5 h-5 text-[#FDB714] flex-shrink-0" />
                 <a
-                  href="tel:+12129120000"
+                  href="tel:6574009122"
                   className="text-gray-300 hover:text-[#FDB714] transition-colors text-sm"
                 >
-                  (212) 912-0000
+                  (657) 400-9122
                 </a>
               </li>
               <li className="flex items-center space-x-3">
@@ -116,16 +116,8 @@ export function Footer() {
             <h3 className="text-lg font-bold mb-4 text-[#FDB714]">HOURS</h3>
             <ul className="space-y-2 text-sm">
               <li className="flex justify-between">
-                <span className="text-gray-300">Monday - Friday:</span>
-                <span className="text-white font-medium">7AM - 9PM</span>
-              </li>
-              <li className="flex justify-between">
-                <span className="text-gray-300">Saturday:</span>
-                <span className="text-white font-medium">8AM - 10PM</span>
-              </li>
-              <li className="flex justify-between">
-                <span className="text-gray-300">Sunday:</span>
-                <span className="text-white font-medium">8AM - 8PM</span>
+                <span className="text-gray-300">Monday - Sunday:</span>
+                <span className="text-white font-medium">8:00 AM - 6:30 PM</span>
               </li>
             </ul>
             <motion.a
