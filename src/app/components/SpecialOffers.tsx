@@ -1,4 +1,4 @@
-import { Gift, Clock, Users } from 'lucide-react';
+import { Gift } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export function SpecialOffers() {
@@ -50,36 +50,18 @@ export function SpecialOffers() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Offer 1 */}
-          <OfferCard
-            icon={<Gift className="w-8 h-8 text-[#1a5633]" />}
-            title="BUY 2 GET 1"
-            highlight="FREE"
-            description="Mix & match any bánh mì"
-            subtext="Available for dine-in and takeout"
-            delay={0}
-          />
-
-          {/* Offer 2 */}
-          <OfferCard
-            icon={<Clock className="w-8 h-8 text-[#1a5633]" />}
-            title="HAPPY HOUR"
-            highlight="20% OFF"
-            description="2PM - 5PM Daily"
-            subtext="All menu items"
-            delay={0.2}
-          />
-
-          {/* Offer 3 */}
-          <OfferCard
-            icon={<Users className="w-8 h-8 text-[#1a5633]" />}
-            title="FAMILY COMBO"
-            highlight="$35.99"
-            description="5 bánh mì + 5 drinks"
-            subtext="Perfect for sharing"
-            delay={0.4}
-          />
+        <div className="flex justify-center">
+          <div className="w-full max-w-md">
+            {/* Offer 1 */}
+            <OfferCard
+              icon={<Gift className="w-8 h-8 text-[#1a5633]" />}
+              title="BUY 2 GET 1"
+              highlight="FREE"
+              description="Mix & match any bánh mì"
+              subtext="Available for dine-in and takeout"
+              delay={0}
+            />
+          </div>
         </div>
 
         {/* Additional Info */}
