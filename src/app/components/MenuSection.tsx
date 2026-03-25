@@ -216,7 +216,7 @@ function MenuItem({ item, index }) {
       {/* Content */}
       <div className="p-6 relative bg-white">
         <motion.div
-          className="flex justify-between items-start mb-3"
+          className="mb-3"
           animate={isHovered ? { x: 3 } : { x: 0 }}
           transition={{ duration: 0.3 }}
         >
@@ -228,13 +228,6 @@ function MenuItem({ item, index }) {
               {item.nameEn}
             </p>
           </div>
-          <motion.span
-            className="text-2xl font-bold text-black"
-            animate={isHovered ? { scale: 1.1 } : { scale: 1 }}
-            style={{ letterSpacing: '0.07px', lineHeight: '32px' }}
-          >
-            {item.price}
-          </motion.span>
         </motion.div>
 
         <p className="text-[#4a5565] text-sm leading-relaxed" style={{ fontSize: '14px', lineHeight: '22.75px', letterSpacing: '-0.15px' }}>
