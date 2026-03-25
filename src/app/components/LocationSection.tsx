@@ -4,7 +4,7 @@ import { motion } from 'motion/react';
 const locations = [
   {
     id: 1,
-    name: 'Westminster Saigon',
+    name: 'Westminster (Little Saigon)',
     address: '9296 Bolsa Ave, Westminster, CA 92683',
     phone: '(657) 400-9122',
     hours: 'Daily: 8 AM - 6:30 PM'
