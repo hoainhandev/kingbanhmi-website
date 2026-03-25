@@ -1,31 +1,13 @@
 import { motion } from 'motion/react';
-import { Mail, Phone, MapPin, Clock } from 'lucide-react';
+import { Mail } from 'lucide-react';
 
 export function FranchiseInfo() {
   const contactInfo = [
     {
-      icon: <Phone className="w-6 h-6" />,
-      title: 'Phone',
-      content: '(212) 912-0000',
-      link: 'tel:+12129120000'
-    },
-    {
       icon: <Mail className="w-6 h-6" />,
       title: 'Email',
-      content: 'franchise@kingbanhmi.com',
-      link: 'mailto:franchise@kingbanhmi.com'
-    },
-    {
-      icon: <MapPin className="w-6 h-6" />,
-      title: 'Address',
-      content: '123 Broadway, New York, NY 10007',
-      link: 'https://maps.google.com'
-    },
-    {
-      icon: <Clock className="w-6 h-6" />,
-      title: 'Business Hours',
-      content: 'Mon - Fri: 9AM - 6PM EST',
-      link: null
+      content: 'franchise@kingbanhmi.us',
+      link: 'mailto:franchise@kingbanhmi.us'
     }
   ];
 
