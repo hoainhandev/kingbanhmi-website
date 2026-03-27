@@ -132,13 +132,13 @@ export function LocationSection() {
             
             <div className="flex flex-col md:flex-row justify-center items-center space-y-6 md:space-y-0 md:space-x-12 mb-8">
               <motion.a 
-                href="mailto:info@kingbanhmi.us" 
+                href="mailto:info@kingbanhmi.net" 
                 className="flex items-center space-x-3 border border-white/20 px-6 py-4 hover:border-[#FDB714] hover:bg-[#FDB714] hover:text-[#1a5633] transition-all"
                 whileHover={{ scale: 1.05, y: -3 }}
                 whileTap={{ scale: 0.95 }}
               >
                 <Mail className="w-5 h-5" />
-                <span className="text-base font-semibold">info@kingbanhmi.us</span>
+                <span className="text-base font-semibold">info@kingbanhmi.net</span>
               </motion.a>
               
               <motion.a 

@@ -6,8 +6,8 @@ export function FranchiseInfo() {
     {
       icon: <Mail className="w-6 h-6" />,
       title: 'Email',
-      content: 'franchise@kingbanhmi.us',
-      link: 'mailto:franchise@kingbanhmi.us'
+      content: 'info@kingbanhmi.net',
+      link: 'mailto:info@kingbanhmi.net'
     }
   ];
 
