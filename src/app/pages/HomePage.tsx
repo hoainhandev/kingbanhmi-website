@@ -1,7 +1,6 @@
 import { Header } from '../components/Header';
 import { Hero } from '../components/Hero';
 import { MenuSection } from '../components/MenuSection';
-import { SpecialOffers } from '../components/SpecialOffers';
 import { StorySection } from '../components/StorySection';
 import { LocationSection } from '../components/LocationSection';
 import { Footer } from '../components/Footer';
