@@ -12,7 +12,7 @@ export default function HomePage() {
       <main>
         <Hero />
         <MenuSection />
-        <SpecialOffers />
+        
         <StorySection />
         <LocationSection />
       </main>
