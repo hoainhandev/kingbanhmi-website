@@ -74,11 +74,9 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="mb-8"
         >
-          <p className="text-2xl sm:text-3xl md:text-[30px] font-light tracking-[3.4px] uppercase text-[#d1d5dc] mb-2" style={{ lineHeight: '36px' }}>
-            An Original
-          </p>
+         
           <p className="text-3xl sm:text-4xl md:text-[36px] font-bold tracking-[1.27px] text-white" style={{ lineHeight: '40px' }}>
-            TASTE OF SAIGON
+            Born in Vietnam, Craved Everywhere
           </p>
         </motion.div>
 
