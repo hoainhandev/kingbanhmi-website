@@ -1,5 +1,6 @@
 import { MapPin, Phone, Mail, Facebook, Instagram } from 'lucide-react';
 import { motion } from 'motion/react';
+import { Link } from 'react-router';
 import logoImage from '@/assets/1b1add06a7bc7986e890eac8334a8c35e64679ee.png';
 
 export function Footer() {
@@ -58,7 +59,7 @@ export function Footer() {
               {['Home', 'Menu', 'Our Story', 'Locations', 'Special Offers'].map((item) => (
                 <li key={item}>
                   <motion.a
-                    href={`#${item.toLowerCase().replace(' ', '-')}`}
+                    href={`/#${item.toLowerCase().replace(' ', '-')}`}
                     className="text-gray-300 hover:text-[#FDB714] transition-colors text-sm"
                     whileHover={{ x: 5 }}
                   >
@@ -66,6 +67,26 @@ export function Footer() {
                   </motion.a>
                 </li>
               ))}
+              <li>
+                <motion.div whileHover={{ x: 5 }}>
+                  <Link
+                    to="/franchise"
+                    className="text-gray-300 hover:text-[#FDB714] transition-colors text-sm"
+                  >
+                    Franchise
+                  </Link>
+                </motion.div>
+              </li>
+              <li>
+                <motion.div whileHover={{ x: 5 }}>
+                  <Link
+                    to="/career"
+                    className="text-gray-300 hover:text-[#FDB714] transition-colors text-sm"
+                  >
+                    Tuyển dụng / Careers
+                  </Link>
+                </motion.div>
+              </li>
             </ul>
           </motion.div>
 

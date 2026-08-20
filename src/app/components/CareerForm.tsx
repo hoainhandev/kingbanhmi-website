@@ -1,0 +1,841 @@
+import { motion } from 'motion/react';
+import { useEffect, useImperativeHandle, useRef, useState, forwardRef } from 'react';
+import { Send, FileText, X } from 'lucide-react';
+import { BRANCH_OPTIONS, jobs } from '../data/jobs';
+
+const inputClass =
+  'w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#FDB714] focus:outline-none transition-colors';
+const labelClass = 'block text-sm font-semibold text-[#013a0f] mb-2';
+const errorClass = 'mt-1 text-sm text-red-500';
+
+const EDUCATION_OPTIONS = [
+  'Trung học phổ thông',
+  'Trung cấp / Cao đẳng',
+  'Đại học',
+  'Sau đại học',
+  'Khác',
+];
+
+const HEAR_ABOUT_OPTIONS = [
+  'Facebook',
+  'Website',
+  'Bạn bè giới thiệu',
+  'Tại cửa hàng',
+  'Khác',
+];
+
+const MAX_CV_BYTES = 5 * 1024 * 1024;
+const ACCEPTED_CV_TYPES = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+];
+const ACCEPTED_CV_EXTENSIONS = ['.pdf', '.doc', '.docx'];
+
+type CareerFormData = {
+  fullName: string;
+  dateOfBirth: string;
+  gender: string;
+  phone: string;
+  email: string;
+  address: string;
+  position: string;
+  preferredBranch: string;
+  employmentType: string;
+  expectedSalary: string;
+  availableStartDate: string;
+  education: string;
+  yearsOfExperience: string;
+  lastWorkplace: string;
+  experienceDescription: string;
+  canWorkNightsWeekends: string;
+  hasFnBExperience: string;
+  hearAboutUs: string;
+  notes: string;
+  privacyConsent: boolean;
+};
+
+const initialFormData: CareerFormData = {
+  fullName: '',
+  dateOfBirth: '',
+  gender: '',
+  phone: '',
+  email: '',
+  address: '',
+  position: '',
+  preferredBranch: '',
+  employmentType: '',
+  expectedSalary: '',
+  availableStartDate: '',
+  education: '',
+  yearsOfExperience: '',
+  lastWorkplace: '',
+  experienceDescription: '',
+  canWorkNightsWeekends: '',
+  hasFnBExperience: '',
+  hearAboutUs: '',
+  notes: '',
+  privacyConsent: false,
+};
+
+type FormErrors = Partial<Record<keyof CareerFormData | 'cv', string>>;
+
+export type CareerFormHandle = {
+  setPosition: (title: string) => void;
+  scrollIntoView: () => void;
+};
+
+function SectionHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mb-6">
+      <h3
+        className="text-xl font-bold text-[#013a0f] mb-2 uppercase"
+        style={{ letterSpacing: '0.5px' }}
+      >
+        {children}
+      </h3>
+      <div className="h-2 w-full bg-[#FDB714] rounded-full" />
+    </div>
+  );
+}
+
+function RadioPills({
+  name,
+  value,
+  options,
+  onChange,
+  required,
+  error,
+}: {
+  name: keyof CareerFormData;
+  value: string;
+  options: string[];
+  onChange: (name: keyof CareerFormData, value: string) => void;
+  required?: boolean;
+  error?: string;
+}) {
+  return (
+    <div>
+      <div className="flex flex-wrap gap-2" role="radiogroup" aria-required={required} aria-invalid={!!error}>
+        {options.map((option) => (
+          <label
+            key={option}
+            className={`px-4 py-2 rounded-full border-2 cursor-pointer transition-colors text-sm min-h-11 inline-flex items-center ${
+              value === option
+                ? 'border-[#FDB714] bg-[#FDB714]/10 text-[#013a0f] font-semibold'
+                : 'border-gray-200 hover:border-[#FDB714]/50 text-[#013a0f]'
+            }`}
+          >
+            <input
+              type="radio"
+              name={name}
+              value={option}
+              checked={value === option}
+              onChange={() => onChange(name, option)}
+              className="sr-only"
+            />
+            {option}
+          </label>
+        ))}
+      </div>
+      {error && <p className={errorClass}>{error}</p>}
+    </div>
+  );
+}
+
+function readFileAsBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      const base64 = result.includes(',') ? result.split(',')[1] : result;
+      resolve(base64);
+    };
+    reader.onerror = () => reject(new Error('Không thể đọc file CV.'));
+    reader.readAsDataURL(file);
+  });
+}
+
+export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, ref) {
+  const [formData, setFormData] = useState<CareerFormData>(initialFormData);
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const formContainerRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fieldRefs = useRef<Partial<Record<keyof FormErrors, HTMLElement | null>>>({});
+
+  useImperativeHandle(ref, () => ({
+    setPosition: (title: string) => {
+      setFormData((prev) => ({ ...prev, position: title }));
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next.position;
+        return next;
+      });
+    },
+    scrollIntoView: () => {
+      formContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    },
+  }));
+
+  useEffect(() => {
+    if (!submitted) return;
+    const timer = setTimeout(() => {
+      setSubmitted(false);
+      setFormData(initialFormData);
+      setCvFile(null);
+      setErrors({});
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [submitted]);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => {
+      const next = { ...prev };
+      delete next[name as keyof FormErrors];
+      return next;
+    });
+  };
+
+  const handleRadioChange = (name: keyof CareerFormData, value: string) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => {
+      const next = { ...prev };
+      delete next[name];
+      return next;
+    });
+  };
+
+  const handleCvChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const lowerName = file.name.toLowerCase();
+    const hasValidExt = ACCEPTED_CV_EXTENSIONS.some((ext) => lowerName.endsWith(ext));
+    const hasValidType = !file.type || ACCEPTED_CV_TYPES.includes(file.type);
+
+    if (!hasValidExt || !hasValidType) {
+      setCvFile(null);
+      setErrors((prev) => ({
+        ...prev,
+        cv: 'Chỉ chấp nhận file .pdf, .doc hoặc .docx.',
+      }));
+      e.target.value = '';
+      return;
+    }
+
+    if (file.size > MAX_CV_BYTES) {
+      setCvFile(null);
+      setErrors((prev) => ({
+        ...prev,
+        cv: 'File CV tối đa 5MB.',
+      }));
+      e.target.value = '';
+      return;
+    }
+
+    setCvFile(file);
+    setErrors((prev) => {
+      const next = { ...prev };
+      delete next.cv;
+      return next;
+    });
+  };
+
+  const clearCv = () => {
+    setCvFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const validate = (): FormErrors => {
+    const next: FormErrors = {};
+    if (!formData.fullName.trim()) next.fullName = 'Vui lòng nhập họ và tên.';
+    if (!formData.dateOfBirth) next.dateOfBirth = 'Vui lòng chọn ngày sinh.';
+    if (!formData.gender) next.gender = 'Vui lòng chọn giới tính.';
+    if (!formData.phone.trim()) next.phone = 'Vui lòng nhập số điện thoại.';
+    if (!formData.email.trim()) {
+      next.email = 'Vui lòng nhập email.';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      next.email = 'Email không hợp lệ.';
+    }
+    if (!formData.address.trim()) next.address = 'Vui lòng nhập địa chỉ hiện tại.';
+    if (!formData.position) next.position = 'Vui lòng chọn vị trí ứng tuyển.';
+    if (!formData.preferredBranch) next.preferredBranch = 'Vui lòng chọn chi nhánh mong muốn.';
+    if (!formData.employmentType) next.employmentType = 'Vui lòng chọn loại hình.';
+    if (!formData.availableStartDate) {
+      next.availableStartDate = 'Vui lòng chọn ngày có thể bắt đầu.';
+    }
+    if (!formData.education) next.education = 'Vui lòng chọn trình độ học vấn.';
+    if (!formData.yearsOfExperience) {
+      next.yearsOfExperience = 'Vui lòng chọn số năm kinh nghiệm.';
+    }
+    if (!formData.canWorkNightsWeekends) {
+      next.canWorkNightsWeekends = 'Vui lòng chọn có thể làm ca tối/cuối tuần hay không.';
+    }
+    if (!formData.hasFnBExperience) {
+      next.hasFnBExperience = 'Vui lòng cho biết bạn đã từng làm F&B chưa.';
+    }
+    if (!formData.hearAboutUs) {
+      next.hearAboutUs = 'Vui lòng cho biết bạn biết tin tuyển dụng qua đâu.';
+    }
+    if (!formData.privacyConsent) {
+      next.privacyConsent = 'Bạn cần đồng ý để chúng tôi lưu trữ thông tin tuyển dụng.';
+    }
+    return next;
+  };
+
+  const scrollToFirstError = (nextErrors: FormErrors) => {
+    const order: (keyof FormErrors)[] = [
+      'fullName',
+      'dateOfBirth',
+      'gender',
+      'phone',
+      'email',
+      'address',
+      'position',
+      'preferredBranch',
+      'employmentType',
+      'availableStartDate',
+      'education',
+      'yearsOfExperience',
+      'canWorkNightsWeekends',
+      'hasFnBExperience',
+      'hearAboutUs',
+      'cv',
+      'privacyConsent',
+    ];
+    for (const key of order) {
+      if (nextErrors[key]) {
+        const el = fieldRefs.current[key];
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          if ('focus' in el && typeof el.focus === 'function') {
+            try {
+              el.focus({ preventScroll: true });
+            } catch {
+              /* ignore */
+            }
+          }
+        }
+        break;
+      }
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const nextErrors = validate();
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) {
+      scrollToFirstError(nextErrors);
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
+
+      if (!scriptUrl) {
+        console.warn('Google Script URL not found. Running in demo mode.');
+        setTimeout(() => {
+          setIsSubmitting(false);
+          setSubmitted(true);
+        }, 1500);
+        return;
+      }
+
+      const data = new FormData();
+      data.append('formType', 'career');
+
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key === 'privacyConsent') {
+          data.append(key, value ? 'Yes' : 'No');
+        } else {
+          data.append(key, String(value));
+        }
+      });
+
+      if (cvFile) {
+        const fileBase64 = await readFileAsBase64(cvFile);
+        data.append('fileName', cvFile.name);
+        data.append('mimeType', cvFile.type || 'application/octet-stream');
+        data.append('fileBase64', fileBase64);
+      }
+
+      await fetch(scriptUrl, {
+        method: 'POST',
+        body: data,
+        mode: 'no-cors',
+      });
+
+      setIsSubmitting(false);
+      setSubmitted(true);
+    } catch (error) {
+      console.error('Error submitting career form:', error);
+      setIsSubmitting(false);
+      alert('Có lỗi khi gửi hồ sơ. Vui lòng thử lại sau.');
+    }
+  };
+
+  const canSubmit = formData.privacyConsent && !isSubmitting;
+  const positionOptions = [...jobs.map((j) => j.title), 'Khác'];
+
+  return (
+    <motion.div
+      ref={formContainerRef}
+      id="career-application-form"
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8 }}
+      viewport={{ once: true }}
+      className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border-4 border-[#FDB714] w-full scroll-mt-28"
+    >
+      <h2 className="text-3xl font-bold text-[#013a0f] mb-6" style={{ letterSpacing: '1.5px' }}>
+        FORM ỨNG TUYỂN
+      </h2>
+
+      {submitted ? (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-green-50 border-2 border-green-500 rounded-xl p-8 text-center"
+        >
+          <div className="w-16 h-16 bg-green-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h3 className="text-2xl font-bold text-green-700 mb-2">Cảm ơn bạn!</h3>
+          <p className="text-green-600">
+            Hồ sơ ứng tuyển đã được gửi. Chúng tôi sẽ liên hệ sớm nếu hồ sơ phù hợp.
+          </p>
+        </motion.div>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-8" noValidate>
+          {/* A. Personal info */}
+          <section>
+            <SectionHeading>A. Thông tin cá nhân</SectionHeading>
+            <div className="bg-[#fefbf3] border border-gray-200 rounded-lg p-4 sm:p-6 space-y-4">
+              <div ref={(el) => { fieldRefs.current.fullName = el; }}>
+                <label htmlFor="fullName" className={labelClass}>
+                  Họ và tên <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="fullName"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  className={inputClass}
+                  placeholder="Nguyễn Văn A"
+                  aria-invalid={!!errors.fullName}
+                  aria-describedby={errors.fullName ? 'fullName-error' : undefined}
+                />
+                {errors.fullName && (
+                  <p id="fullName-error" className={errorClass}>{errors.fullName}</p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div ref={(el) => { fieldRefs.current.dateOfBirth = el; }}>
+                  <label htmlFor="dateOfBirth" className={labelClass}>
+                    Ngày sinh <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    id="dateOfBirth"
+                    name="dateOfBirth"
+                    value={formData.dateOfBirth}
+                    onChange={handleChange}
+                    className={inputClass}
+                    aria-invalid={!!errors.dateOfBirth}
+                  />
+                  {errors.dateOfBirth && <p className={errorClass}>{errors.dateOfBirth}</p>}
+                </div>
+                <div ref={(el) => { fieldRefs.current.gender = el; }}>
+                  <label className={labelClass}>
+                    Giới tính <span className="text-red-500">*</span>
+                  </label>
+                  <RadioPills
+                    name="gender"
+                    value={formData.gender}
+                    options={['Nam', 'Nữ', 'Khác']}
+                    onChange={handleRadioChange}
+                    required
+                    error={errors.gender}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div ref={(el) => { fieldRefs.current.phone = el; }}>
+                  <label htmlFor="phone" className={labelClass}>
+                    Số điện thoại <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className={inputClass}
+                    placeholder="(657) 400-9122"
+                    aria-invalid={!!errors.phone}
+                  />
+                  {errors.phone && <p className={errorClass}>{errors.phone}</p>}
+                </div>
+                <div ref={(el) => { fieldRefs.current.email = el; }}>
+                  <label htmlFor="email" className={labelClass}>
+                    Email <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className={inputClass}
+                    placeholder="ban@email.com"
+                    aria-invalid={!!errors.email}
+                  />
+                  {errors.email && <p className={errorClass}>{errors.email}</p>}
+                </div>
+              </div>
+
+              <div ref={(el) => { fieldRefs.current.address = el; }}>
+                <label htmlFor="address" className={labelClass}>
+                  Địa chỉ hiện tại <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="address"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  className={inputClass}
+                  placeholder="Thành phố, tiểu bang"
+                  aria-invalid={!!errors.address}
+                />
+                {errors.address && <p className={errorClass}>{errors.address}</p>}
+              </div>
+            </div>
+          </section>
+
+          {/* B. Position */}
+          <section className="space-y-4">
+            <SectionHeading>B. Vị trí ứng tuyển</SectionHeading>
+
+            <div ref={(el) => { fieldRefs.current.position = el; }}>
+              <label htmlFor="position" className={labelClass}>
+                Vị trí ứng tuyển <span className="text-red-500">*</span>
+              </label>
+              <select
+                id="position"
+                name="position"
+                value={formData.position}
+                onChange={handleChange}
+                className={inputClass}
+                aria-invalid={!!errors.position}
+              >
+                <option value="">Chọn vị trí</option>
+                {positionOptions.map((opt) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+              {errors.position && <p className={errorClass}>{errors.position}</p>}
+            </div>
+
+            <div ref={(el) => { fieldRefs.current.preferredBranch = el; }}>
+              <label htmlFor="preferredBranch" className={labelClass}>
+                Chi nhánh mong muốn <span className="text-red-500">*</span>
+              </label>
+              <select
+                id="preferredBranch"
+                name="preferredBranch"
+                value={formData.preferredBranch}
+                onChange={handleChange}
+                className={inputClass}
+                aria-invalid={!!errors.preferredBranch}
+              >
+                <option value="">Chọn chi nhánh</option>
+                {BRANCH_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+              {errors.preferredBranch && <p className={errorClass}>{errors.preferredBranch}</p>}
+            </div>
+
+            <div ref={(el) => { fieldRefs.current.employmentType = el; }}>
+              <label className={labelClass}>
+                Loại hình <span className="text-red-500">*</span>
+              </label>
+              <RadioPills
+                name="employmentType"
+                value={formData.employmentType}
+                options={['Full-time', 'Part-time', 'Thực tập']}
+                onChange={handleRadioChange}
+                required
+                error={errors.employmentType}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="expectedSalary" className={labelClass}>
+                Mức lương mong muốn
+              </label>
+              <input
+                type="text"
+                id="expectedSalary"
+                name="expectedSalary"
+                value={formData.expectedSalary}
+                onChange={handleChange}
+                className={inputClass}
+                placeholder="VD: $20 / hour"
+              />
+            </div>
+
+            <div ref={(el) => { fieldRefs.current.availableStartDate = el; }}>
+              <label htmlFor="availableStartDate" className={labelClass}>
+                Ngày có thể bắt đầu làm việc <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="date"
+                id="availableStartDate"
+                name="availableStartDate"
+                value={formData.availableStartDate}
+                onChange={handleChange}
+                className={inputClass}
+                aria-invalid={!!errors.availableStartDate}
+              />
+              {errors.availableStartDate && (
+                <p className={errorClass}>{errors.availableStartDate}</p>
+              )}
+            </div>
+          </section>
+
+          {/* C. Experience */}
+          <section className="space-y-4">
+            <SectionHeading>C. Kinh nghiệm &amp; học vấn</SectionHeading>
+
+            <div ref={(el) => { fieldRefs.current.education = el; }}>
+              <label htmlFor="education" className={labelClass}>
+                Trình độ học vấn <span className="text-red-500">*</span>
+              </label>
+              <select
+                id="education"
+                name="education"
+                value={formData.education}
+                onChange={handleChange}
+                className={inputClass}
+                aria-invalid={!!errors.education}
+              >
+                <option value="">Chọn trình độ</option>
+                {EDUCATION_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+              {errors.education && <p className={errorClass}>{errors.education}</p>}
+            </div>
+
+            <div ref={(el) => { fieldRefs.current.yearsOfExperience = el; }}>
+              <label className={labelClass}>
+                Số năm kinh nghiệm <span className="text-red-500">*</span>
+              </label>
+              <RadioPills
+                name="yearsOfExperience"
+                value={formData.yearsOfExperience}
+                options={['Chưa có', 'Dưới 1 năm', '1-3 năm', 'Trên 3 năm']}
+                onChange={handleRadioChange}
+                required
+                error={errors.yearsOfExperience}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="lastWorkplace" className={labelClass}>
+                Nơi làm việc gần nhất + vị trí
+              </label>
+              <input
+                type="text"
+                id="lastWorkplace"
+                name="lastWorkplace"
+                value={formData.lastWorkplace}
+                onChange={handleChange}
+                className={inputClass}
+                placeholder="Tên công ty — vị trí"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="experienceDescription" className={labelClass}>
+                Mô tả kinh nghiệm liên quan
+              </label>
+              <textarea
+                id="experienceDescription"
+                name="experienceDescription"
+                value={formData.experienceDescription}
+                onChange={handleChange}
+                rows={4}
+                className={`${inputClass} resize-none`}
+                placeholder="Chia sẻ kinh nghiệm F&B, phục vụ, bếp, pha chế..."
+              />
+            </div>
+          </section>
+
+          {/* D. Additional */}
+          <section className="space-y-4">
+            <SectionHeading>D. Thông tin bổ sung</SectionHeading>
+
+            <div ref={(el) => { fieldRefs.current.canWorkNightsWeekends = el; }}>
+              <label className={labelClass}>
+                Có thể làm ca tối / cuối tuần? <span className="text-red-500">*</span>
+              </label>
+              <RadioPills
+                name="canWorkNightsWeekends"
+                value={formData.canWorkNightsWeekends}
+                options={['Có', 'Không']}
+                onChange={handleRadioChange}
+                required
+                error={errors.canWorkNightsWeekends}
+              />
+            </div>
+
+            <div ref={(el) => { fieldRefs.current.hasFnBExperience = el; }}>
+              <label className={labelClass}>
+                Đã từng làm F&amp;B? <span className="text-red-500">*</span>
+              </label>
+              <RadioPills
+                name="hasFnBExperience"
+                value={formData.hasFnBExperience}
+                options={['Có', 'Không']}
+                onChange={handleRadioChange}
+                required
+                error={errors.hasFnBExperience}
+              />
+            </div>
+
+            <div ref={(el) => { fieldRefs.current.hearAboutUs = el; }}>
+              <label htmlFor="hearAboutUs" className={labelClass}>
+                Biết đến tin tuyển dụng qua đâu? <span className="text-red-500">*</span>
+              </label>
+              <select
+                id="hearAboutUs"
+                name="hearAboutUs"
+                value={formData.hearAboutUs}
+                onChange={handleChange}
+                className={inputClass}
+                aria-invalid={!!errors.hearAboutUs}
+              >
+                <option value="">Chọn nguồn</option>
+                {HEAR_ABOUT_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+              {errors.hearAboutUs && <p className={errorClass}>{errors.hearAboutUs}</p>}
+            </div>
+
+            <div ref={(el) => { fieldRefs.current.cv = el; }}>
+              <label htmlFor="cv" className={labelClass}>
+                Upload CV
+              </label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                id="cv"
+                name="cv"
+                accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                onChange={handleCvChange}
+                className="block w-full text-sm text-[#013a0f] file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:bg-[#FDB714] file:text-[#013a0f] file:font-semibold hover:file:bg-[#e6a612] cursor-pointer"
+                aria-invalid={!!errors.cv}
+              />
+              <p className="mt-1 text-xs text-[#4a5565]">PDF, DOC hoặc DOCX — tối đa 5MB</p>
+              {cvFile && (
+                <div className="mt-3 flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">
+                  <FileText className="w-5 h-5 text-[#013a0f] shrink-0" aria-hidden="true" />
+                  <span className="text-sm text-[#013a0f] flex-1 truncate">{cvFile.name}</span>
+                  <button
+                    type="button"
+                    onClick={clearCv}
+                    className="p-2 rounded-lg hover:bg-gray-200 text-[#013a0f] min-h-11 min-w-11 inline-flex items-center justify-center"
+                    aria-label="Xóa file CV"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+              {errors.cv && <p className={errorClass}>{errors.cv}</p>}
+            </div>
+
+            <div>
+              <label htmlFor="notes" className={labelClass}>
+                Ghi chú thêm
+              </label>
+              <textarea
+                id="notes"
+                name="notes"
+                value={formData.notes}
+                onChange={handleChange}
+                rows={3}
+                className={`${inputClass} resize-none`}
+                placeholder="Thông tin bổ sung bạn muốn chia sẻ..."
+              />
+            </div>
+
+            <label
+              ref={(el) => { fieldRefs.current.privacyConsent = el; }}
+              className="flex items-start gap-3 cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                checked={formData.privacyConsent}
+                onChange={(e) => {
+                  setFormData((prev) => ({ ...prev, privacyConsent: e.target.checked }));
+                  setErrors((prev) => {
+                    const next = { ...prev };
+                    delete next.privacyConsent;
+                    return next;
+                  });
+                }}
+                className="mt-1 w-4 h-4 accent-[#FDB714] shrink-0"
+                aria-invalid={!!errors.privacyConsent}
+              />
+              <span className="text-sm text-[#013a0f] leading-relaxed">
+                Tôi đồng ý cho phép King Banh Mi lưu trữ và xử lý thông tin cá nhân phục vụ
+                mục đích tuyển dụng. <span className="text-red-500">*</span>
+              </span>
+            </label>
+            {errors.privacyConsent && <p className={errorClass}>{errors.privacyConsent}</p>}
+          </section>
+
+          <motion.button
+            type="submit"
+            disabled={!canSubmit}
+            className="w-full bg-[#FDB714] text-[#013a0f] font-bold py-4 rounded-lg hover:bg-[#e6a612] transition-all duration-300 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed min-h-14"
+            whileHover={{ scale: canSubmit ? 1.02 : 1 }}
+            whileTap={{ scale: canSubmit ? 0.98 : 1 }}
+          >
+            {isSubmitting ? (
+              <>
+                <div className="w-5 h-5 border-2 border-[#013a0f] border-t-transparent rounded-full animate-spin" aria-hidden="true"></div>
+                <span>ĐANG GỬI...</span>
+              </>
+            ) : (
+              <>
+                <Send className="w-5 h-5" aria-hidden="true" />
+                <span>GỬI HỒ SƠ ỨNG TUYỂN</span>
+              </>
+            )}
+          </motion.button>
+        </form>
+      )}
+    </motion.div>
+  );
+});

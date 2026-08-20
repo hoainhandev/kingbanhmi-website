@@ -180,6 +180,7 @@ export function FranchiseForm() {
       }
 
       const data = new FormData();
+      data.append('formType', 'franchise');
       Object.entries(formData).forEach(([key, value]) => {
         if (key === 'whatAttracts') {
           data.append(key, (value as string[]).join(', '));

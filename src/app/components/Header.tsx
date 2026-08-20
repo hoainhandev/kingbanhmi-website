@@ -103,6 +103,21 @@ export function Header() {
                 FRANCHISE
               </Link>
             </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.5 }}
+            >
+              <Link
+                to="/career"
+                className={`relative font-medium transition-colors text-sm tracking-wide ${
+                  location.pathname === '/career' ? 'text-[#FCAF15]' : 'text-[#fbfbfb] hover:text-[#FCAF15]'
+                }`}
+              >
+                CAREERS
+              </Link>
+            </motion.div>
           </nav>
 
           {/* Contact Button - Desktop */}
@@ -208,6 +223,20 @@ export function Header() {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   FRANCHISE
+                </Link>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: 0.45 }}
+              >
+                <Link
+                  to="/career"
+                  className="block w-full text-left py-2 text-white hover:text-[#FCAF15] transition-colors text-sm tracking-wide font-medium"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  CAREERS
                 </Link>
               </motion.div>
               
