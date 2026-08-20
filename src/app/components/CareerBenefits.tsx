@@ -4,27 +4,27 @@ import { Heart, Users, GraduationCap, TrendingUp } from 'lucide-react';
 const benefits = [
   {
     icon: Users,
-    title: 'Môi trường trẻ trung',
+    title: 'Friendly Team Culture',
     description:
-      'Làm việc cùng đội ngũ năng động, thân thiện — nơi mỗi ngày mang hương vị Việt đến khách hàng.',
+      'Work alongside a supportive crew that celebrates Vietnamese hospitality and looks out for one another.',
   },
   {
     icon: GraduationCap,
-    title: 'Đào tạo bài bản',
+    title: 'Hands-on Training',
     description:
-      'Được hướng dẫn quy trình, công thức và kỹ năng phục vụ theo chuẩn thương hiệu King Banh Mi.',
+      'Learn our recipes, beverage program, and service standards with structured on-the-job coaching.',
   },
   {
     icon: TrendingUp,
-    title: 'Lộ trình thăng tiến',
+    title: 'Growth Opportunities',
     description:
-      'Cơ hội phát triển từ nhân viên đến trưởng ca / quản lý khi bạn sẵn sàng đảm nhận.',
+      'Clear paths from crew to shift lead and store management for team members ready to step up.',
   },
   {
     icon: Heart,
-    title: 'Chế độ phúc lợi',
+    title: 'Competitive Benefits',
     description:
-      'Lương cạnh tranh theo năng lực, hỗ trợ ca làm việc linh hoạt và môi trường tôn trọng lẫn nhau.',
+      'Competitive pay based on experience, flexible scheduling where possible, and a respectful workplace.',
   },
 ];
 
@@ -43,12 +43,12 @@ export function CareerBenefits() {
           className="text-3xl md:text-4xl font-bold text-[#013a0f] mb-4"
           style={{ letterSpacing: '1.5px' }}
         >
-          VÌ SAO CHỌN KING BANH MI
+          WHY WORK WITH US
         </h2>
         <div className="w-20 h-1 bg-[#FDB714] mb-4" aria-hidden="true"></div>
         <p className="text-lg text-[#4a5565] leading-relaxed max-w-2xl">
-          Chúng tôi xây dựng đội ngũ bằng sự chân thành — gửi hồ sơ để được ghi nhận vào talent
-          pool, và liên hệ khi có vị trí phù hợp.
+          Join a brand rooted in authentic Vietnamese flavors. Submit your application to our talent
+          pool and we&apos;ll reach out when a fitting role opens.
         </p>
       </div>
 

@@ -80,10 +80,10 @@ export function Footer() {
               <li>
                 <motion.div whileHover={{ x: 5 }}>
                   <Link
-                    to="/career"
+                    to="/careers"
                     className="text-gray-300 hover:text-[#FDB714] transition-colors text-sm"
                   >
-                    Tuyển dụng
+                    Careers
                   </Link>
                 </motion.div>
               </li>

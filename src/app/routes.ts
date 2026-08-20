@@ -1,7 +1,7 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter, redirect } from "react-router";
 import HomePage from "./pages/HomePage";
 import FranchisePage from "./pages/FranchisePage";
-import CareerPage from "./pages/CareerPage";
+import CareersPage from "./pages/CareersPage";
 
 export const router = createBrowserRouter([
   {
@@ -13,7 +13,11 @@ export const router = createBrowserRouter([
     Component: FranchisePage,
   },
   {
+    path: "/careers",
+    Component: CareersPage,
+  },
+  {
     path: "/career",
-    Component: CareerPage,
+    loader: () => redirect("/careers"),
   },
 ]);

@@ -110,12 +110,14 @@ export function Header() {
               transition={{ duration: 0.3, delay: 0.5 }}
             >
               <Link
-                to="/career"
+                to="/careers"
                 className={`relative font-medium transition-colors text-sm tracking-wide ${
-                  location.pathname === '/career' ? 'text-[#FCAF15]' : 'text-[#fbfbfb] hover:text-[#FCAF15]'
+                  location.pathname === '/careers' || location.pathname === '/career'
+                    ? 'text-[#FCAF15]'
+                    : 'text-[#fbfbfb] hover:text-[#FCAF15]'
                 }`}
               >
-                TUYỂN DỤNG
+                CAREERS
               </Link>
             </motion.div>
           </nav>
@@ -232,11 +234,11 @@ export function Header() {
                 transition={{ duration: 0.3, delay: 0.45 }}
               >
                 <Link
-                  to="/career"
+                  to="/careers"
                   className="block w-full text-left py-2 text-white hover:text-[#FCAF15] transition-colors text-sm tracking-wide font-medium"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  TUYỂN DỤNG
+                  CAREERS
                 </Link>
               </motion.div>
               

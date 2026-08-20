@@ -5,11 +5,11 @@ import { CareerHero } from '../components/CareerHero';
 import { CareerBenefits } from '../components/CareerBenefits';
 import { CareerForm, type CareerFormHandle } from '../components/CareerForm';
 
-const PAGE_TITLE = 'Tuyển dụng / Careers | King Bánh Mì';
+const PAGE_TITLE = 'Careers | King Bánh Mì';
 const PAGE_DESCRIPTION =
-  'Gửi hồ sơ ứng tuyển vào talent pool King Banh Mi. Khi có vị trí phù hợp, đội ngũ tuyển dụng sẽ liên hệ với bạn.';
+  'Join the King Banh Mi talent pool. Send your application today and we will reach out when a role that fits opens up.';
 
-export default function CareerPage() {
+export default function CareersPage() {
   const formRef = useRef<CareerFormHandle>(null);
 
   useEffect(() => {

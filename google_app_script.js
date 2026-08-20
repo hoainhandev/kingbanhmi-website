@@ -376,22 +376,22 @@ function buildBrandedEmailShell(bannerTitle, bodyHtml, footerLabel) {
 }
 
 function sendCareerAutoReplyEmail(toEmail, fullName, interestedPosition, interestedPositionOther) {
-  var displayName = fullName || 'Ứng viên';
+  var displayName = fullName || 'Applicant';
   var safeName = escapeHtml(displayName);
-  var positionLabel = interestedPosition === 'Khác' && interestedPositionOther
+  var positionLabel = interestedPosition === 'Other' && interestedPositionOther
     ? interestedPositionOther
-    : (interestedPosition || 'talent pool');
+    : (interestedPosition || 'our talent pool');
   var safePosition = escapeHtml(positionLabel);
-  var subject = 'Cảm ơn bạn đã gửi hồ sơ tới King Banh Mi';
+  var subject = 'Thanks for Applying to King Banh Mi';
 
   var bodyHtml =
     '<tr>' +
       '<td style="padding:32px 32px 8px 32px; font-family:Arial,Helvetica,sans-serif; color:#333333; font-size:15px; line-height:1.6;">' +
         '<p style="margin:0 0 16px 0; color:' + CONFIG.BRAND_GREEN + '; font-size:15px; line-height:1.6;">Dear ' + safeName + ',</p>' +
-        '<p style="margin:0 0 16px 0; color:#333333; font-size:15px; line-height:1.6;">Cảm ơn bạn đã gửi hồ sơ ứng tuyển tới <strong style="color:' + CONFIG.BRAND_GREEN + ';">King Banh Mi</strong>. Chúng tôi đã ghi nhận thông tin của bạn vào talent pool' +
-        (safePosition ? ' cho lĩnh vực / vị trí <strong style="color:' + CONFIG.BRAND_GREEN + ';">' + safePosition + '</strong>' : '') + '.</p>' +
-        '<p style="margin:0 0 16px 0; color:#333333; font-size:15px; line-height:1.6;">Khi có vị trí phù hợp, đội ngũ tuyển dụng sẽ liên hệ với bạn trong thời gian sớm nhất.</p>' +
-        '<p style="margin:0; color:#333333; font-size:15px; line-height:1.6;">Chúng tôi rất mong được đồng hành cùng bạn.</p>' +
+        '<p style="margin:0 0 16px 0; color:#333333; font-size:15px; line-height:1.6;">Thank you for submitting your application to <strong style="color:' + CONFIG.BRAND_GREEN + ';">King Banh Mi</strong>. We have added your information to our talent pool' +
+        (safePosition ? ' for <strong style="color:' + CONFIG.BRAND_GREEN + ';">' + safePosition + '</strong>' : '') + '.</p>' +
+        '<p style="margin:0 0 16px 0; color:#333333; font-size:15px; line-height:1.6;">When a suitable role opens up, our recruiting team will be in touch.</p>' +
+        '<p style="margin:0; color:#333333; font-size:15px; line-height:1.6;">We look forward to the possibility of working together.</p>' +
       '</td>' +
     '</tr>' +
     '<tr>' +
@@ -402,7 +402,7 @@ function sendCareerAutoReplyEmail(toEmail, fullName, interestedPosition, interes
         '<table cellpadding="0" cellspacing="0" border="0" style="margin:0;">' +
           '<tr>' +
             '<td align="center" bgcolor="' + CONFIG.BRAND_YELLOW + '" style="background-color:' + CONFIG.BRAND_YELLOW + '; border-radius:6px;">' +
-              '<a href="https://www.kingbanhmi.net/career" target="_blank" style="display:inline-block; padding:12px 24px; font-family:Arial,Helvetica,sans-serif; font-size:14px; font-weight:bold; color:' + CONFIG.BRAND_GREEN + '; text-decoration:none; line-height:1.4;">www.kingbanhmi.net/career</a>' +
+              '<a href="https://www.kingbanhmi.net/careers" target="_blank" style="display:inline-block; padding:12px 24px; font-family:Arial,Helvetica,sans-serif; font-size:14px; font-weight:bold; color:' + CONFIG.BRAND_GREEN + '; text-decoration:none; line-height:1.4;">www.kingbanhmi.net/careers</a>' +
             '</td>' +
           '</tr>' +
         '</table>' +
@@ -412,27 +412,27 @@ function sendCareerAutoReplyEmail(toEmail, fullName, interestedPosition, interes
   MailApp.sendEmail({
     to: toEmail,
     subject: subject,
-    htmlBody: buildBrandedEmailShell('CAREERS / TUYỂN DỤNG', bodyHtml, 'Careers')
+    htmlBody: buildBrandedEmailShell('CAREERS', bodyHtml, 'Careers')
   });
 }
 
 function sendCareerHrNotifyEmail(info) {
-  var positionLabel = info.interestedPosition === 'Khác' && info.interestedPositionOther
+  var positionLabel = info.interestedPosition === 'Other' && info.interestedPositionOther
     ? info.interestedPositionOther
     : info.interestedPosition;
-  var subject = '[Career] Hồ sơ mới — ' + (info.fullName || 'Ứng viên');
+  var subject = '[Career] New application — ' + (info.fullName || 'Applicant');
   var cvLine = info.cvUrl && info.cvUrl !== '—'
     ? '<p><strong>CV:</strong> <a href="' + escapeHtml(info.cvUrl) + '">' + escapeHtml(info.cvUrl) + '</a></p>'
     : '<p><strong>CV:</strong> —</p>';
 
   var htmlBody =
-    '<p>Có hồ sơ ứng tuyển mới vào talent pool.</p>' +
-    '<p><strong>Họ tên:</strong> ' + escapeHtml(info.fullName || '') + '<br>' +
+    '<p>A new talent-pool application has been submitted.</p>' +
+    '<p><strong>Name:</strong> ' + escapeHtml(info.fullName || '') + '<br>' +
     '<strong>Email:</strong> ' + escapeHtml(info.email || '') + '<br>' +
-    '<strong>Điện thoại:</strong> ' + escapeHtml(info.phone || '') + '<br>' +
-    '<strong>Vị trí quan tâm:</strong> ' + escapeHtml(positionLabel || '') + '<br>' +
-    '<strong>Chi nhánh:</strong> ' + escapeHtml(info.preferredBranch || '') + '<br>' +
-    '<strong>Loại hình:</strong> ' + escapeHtml(info.employmentType || '') + '</p>' +
+    '<strong>Phone:</strong> ' + escapeHtml(info.phone || '') + '<br>' +
+    '<strong>Area of interest:</strong> ' + escapeHtml(positionLabel || '') + '<br>' +
+    '<strong>Preferred branch:</strong> ' + escapeHtml(info.preferredBranch || '') + '<br>' +
+    '<strong>Employment type:</strong> ' + escapeHtml(info.employmentType || '') + '</p>' +
     cvLine;
 
   MailApp.sendEmail({

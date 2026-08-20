@@ -9,15 +9,15 @@ const labelClass = 'block text-sm font-semibold text-[#013a0f] mb-2';
 const errorClass = 'mt-1 text-sm text-red-500';
 
 const POSITION_OPTIONS = [
-  'Nhân viên bán hàng',
-  'Phụ bếp / Bếp chính',
-  'Thu ngân',
-  'Quản lý ca / Cửa hàng trưởng',
-  'Giao hàng',
+  'Sales Associate',
+  'Kitchen Staff / Chef',
+  'Cashier',
+  'Shift Supervisor / Store Manager',
+  'Delivery Driver',
   'Marketing / Content',
-  'Kế toán',
-  'Nhân sự',
-  'Khác',
+  'Accounting',
+  'Human Resources',
+  'Other',
 ] as const;
 
 const BRANCH_OPTIONS = [
@@ -26,19 +26,19 @@ const BRANCH_OPTIONS = [
 ] as const;
 
 const EDUCATION_OPTIONS = [
-  'Trung học phổ thông',
-  'Trung cấp / Cao đẳng',
-  'Đại học',
-  'Sau đại học',
-  'Khác',
+  'High School',
+  'Associate / Vocational',
+  "Bachelor's Degree",
+  'Graduate Degree',
+  'Other',
 ] as const;
 
 const HEAR_ABOUT_OPTIONS = [
   'Facebook',
   'Website',
-  'Bạn bè giới thiệu',
-  'Tại cửa hàng',
-  'Khác',
+  'Referral from a friend',
+  'In-store',
+  'Other',
 ] as const;
 
 const MAX_CV_BYTES = 5 * 1024 * 1024;
@@ -187,7 +187,7 @@ function readFileAsBase64(file: File): Promise<string> {
       const base64 = result.includes(',') ? result.split(',')[1] : result;
       resolve(base64);
     };
-    reader.onerror = () => reject(new Error('Không thể đọc file CV.'));
+    reader.onerror = () => reject(new Error('Unable to read the CV file.'));
     reader.readAsDataURL(file);
   });
 }
@@ -253,7 +253,7 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
       setCvFile(null);
       setErrors((prev) => ({
         ...prev,
-        cv: 'Chỉ chấp nhận file .pdf, .doc hoặc .docx.',
+        cv: 'Only .pdf, .doc, or .docx files are accepted.',
       }));
       e.target.value = '';
       return;
@@ -263,7 +263,7 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
       setCvFile(null);
       setErrors((prev) => ({
         ...prev,
-        cv: 'File CV tối đa 5MB.',
+        cv: 'CV file must be 5MB or smaller.',
       }));
       e.target.value = '';
       return;
@@ -284,44 +284,44 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
 
   const validate = (): FormErrors => {
     const next: FormErrors = {};
-    if (!formData.fullName.trim()) next.fullName = 'Vui lòng nhập họ và tên.';
-    if (!formData.dateOfBirth) next.dateOfBirth = 'Vui lòng chọn ngày sinh.';
-    if (!formData.gender) next.gender = 'Vui lòng chọn giới tính.';
-    if (!formData.phone.trim()) next.phone = 'Vui lòng nhập số điện thoại.';
+    if (!formData.fullName.trim()) next.fullName = 'Please enter your full name.';
+    if (!formData.dateOfBirth) next.dateOfBirth = 'Please select your date of birth.';
+    if (!formData.gender) next.gender = 'Please select your gender.';
+    if (!formData.phone.trim()) next.phone = 'Please enter your phone number.';
     if (!formData.email.trim()) {
-      next.email = 'Vui lòng nhập email.';
+      next.email = 'Please enter your email.';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      next.email = 'Email không hợp lệ.';
+      next.email = 'Please enter a valid email address.';
     }
-    if (!formData.address.trim()) next.address = 'Vui lòng nhập địa chỉ hiện tại.';
+    if (!formData.address.trim()) next.address = 'Please enter your current address.';
     if (!formData.interestedPosition) {
-      next.interestedPosition = 'Vui lòng chọn lĩnh vực / vị trí quan tâm.';
+      next.interestedPosition = 'Please select an area of interest.';
     }
-    if (formData.interestedPosition === 'Khác' && !formData.interestedPositionOther.trim()) {
-      next.interestedPositionOther = 'Vui lòng nhập vị trí mong muốn.';
+    if (formData.interestedPosition === 'Other' && !formData.interestedPositionOther.trim()) {
+      next.interestedPositionOther = 'Please enter your preferred role.';
     }
     if (!formData.preferredBranch) {
-      next.preferredBranch = 'Vui lòng chọn khu vực / chi nhánh mong muốn.';
+      next.preferredBranch = 'Please select a preferred location / branch.';
     }
-    if (!formData.employmentType) next.employmentType = 'Vui lòng chọn loại hình.';
+    if (!formData.employmentType) next.employmentType = 'Please select an employment type.';
     if (!formData.availableStartDate) {
-      next.availableStartDate = 'Vui lòng chọn thời gian có thể bắt đầu.';
+      next.availableStartDate = 'Please select your earliest start date.';
     }
-    if (!formData.education) next.education = 'Vui lòng chọn trình độ học vấn.';
+    if (!formData.education) next.education = 'Please select your education level.';
     if (!formData.yearsOfExperience) {
-      next.yearsOfExperience = 'Vui lòng chọn số năm kinh nghiệm.';
+      next.yearsOfExperience = 'Please select your years of experience.';
     }
     if (!formData.canWorkNightsWeekends) {
-      next.canWorkNightsWeekends = 'Vui lòng chọn có thể làm ca tối/cuối tuần hay không.';
+      next.canWorkNightsWeekends = 'Please indicate evening / weekend availability.';
     }
     if (!formData.hasFnBExperience) {
-      next.hasFnBExperience = 'Vui lòng cho biết bạn đã từng làm F&B chưa.';
+      next.hasFnBExperience = 'Please indicate whether you have F&B experience.';
     }
     if (!formData.hearAboutUs) {
-      next.hearAboutUs = 'Vui lòng cho biết bạn biết đến King Banh Mi qua đâu.';
+      next.hearAboutUs = 'Please tell us how you heard about us.';
     }
     if (!formData.privacyConsent) {
-      next.privacyConsent = 'Bạn cần đồng ý để chúng tôi lưu trữ thông tin tuyển dụng.';
+      next.privacyConsent = 'Please agree so we can store your information for recruitment.';
     }
     return next;
   };
@@ -417,7 +417,7 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
     } catch (error) {
       console.error('Error submitting career form:', error);
       setIsSubmitting(false);
-      alert('Có lỗi khi gửi hồ sơ. Vui lòng thử lại sau.');
+      alert('There was an error submitting your application. Please try again later.');
     }
   };
 
@@ -434,11 +434,11 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
       className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border-4 border-[#FDB714] w-full scroll-mt-28"
     >
       <h2 className="text-3xl font-bold text-[#013a0f] mb-2" style={{ letterSpacing: '1.5px' }}>
-        FORM ỨNG TUYỂN
+        APPLICATION FORM
       </h2>
       <p className="text-[#4a5565] text-sm mb-6 leading-relaxed">
-        Gửi hồ sơ vào talent pool của King Banh Mi. Khi có vị trí phù hợp, chúng tôi sẽ liên hệ với
-        bạn.
+        Join the King Banh Mi talent pool. We&apos;ll reach out when a role that fits your
+        background opens up.
       </p>
 
       {submitted ? (
@@ -453,21 +453,20 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h3 className="text-2xl font-bold text-green-700 mb-2">Cảm ơn bạn!</h3>
+          <h3 className="text-2xl font-bold text-green-700 mb-2">Thank You!</h3>
           <p className="text-green-600">
-            Hồ sơ của bạn đã được ghi nhận. Khi có vị trí phù hợp, chúng tôi sẽ liên hệ trong thời
-            gian sớm nhất.
+            Thanks for applying! Your application has been received. We&apos;ll be in touch as soon
+            as a suitable role opens up.
           </p>
         </motion.div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-8" noValidate>
-          {/* A. Personal */}
           <section>
-            <SectionHeading>A. Thông tin cá nhân</SectionHeading>
+            <SectionHeading>A. Personal Information</SectionHeading>
             <div className="bg-[#fefbf3] border border-gray-200 rounded-lg p-4 sm:p-6 space-y-4">
               <div ref={(el) => { fieldRefs.current.fullName = el; }}>
                 <label htmlFor="career-fullName" className={labelClass}>
-                  Họ và tên <span className="text-red-500">*</span>
+                  Full Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -476,7 +475,7 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
                   value={formData.fullName}
                   onChange={handleChange}
                   className={inputClass}
-                  placeholder="Nguyễn Văn A"
+                  placeholder="John Doe"
                   aria-invalid={!!errors.fullName}
                   aria-describedby={errors.fullName ? 'career-fullName-error' : undefined}
                 />
@@ -488,7 +487,7 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div ref={(el) => { fieldRefs.current.dateOfBirth = el; }}>
                   <label htmlFor="career-dateOfBirth" className={labelClass}>
-                    Ngày sinh <span className="text-red-500">*</span>
+                    Date of Birth <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="date"
@@ -503,12 +502,12 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
                 </div>
                 <div ref={(el) => { fieldRefs.current.gender = el; }}>
                   <span className={labelClass}>
-                    Giới tính <span className="text-red-500">*</span>
+                    Gender <span className="text-red-500">*</span>
                   </span>
                   <RadioPills
                     name="gender"
                     value={formData.gender}
-                    options={['Nam', 'Nữ', 'Khác']}
+                    options={['Male', 'Female', 'Other']}
                     onChange={handleRadioChange}
                     required
                     error={errors.gender}
@@ -519,7 +518,7 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div ref={(el) => { fieldRefs.current.phone = el; }}>
                   <label htmlFor="career-phone" className={labelClass}>
-                    Số điện thoại <span className="text-red-500">*</span>
+                    Phone Number <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="tel"
@@ -544,7 +543,7 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
                     value={formData.email}
                     onChange={handleChange}
                     className={inputClass}
-                    placeholder="ban@email.com"
+                    placeholder="you@email.com"
                     aria-invalid={!!errors.email}
                   />
                   {errors.email && <p className={errorClass}>{errors.email}</p>}
@@ -553,7 +552,7 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
 
               <div ref={(el) => { fieldRefs.current.address = el; }}>
                 <label htmlFor="career-address" className={labelClass}>
-                  Địa chỉ hiện tại <span className="text-red-500">*</span>
+                  Current Address <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -562,7 +561,7 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
                   value={formData.address}
                   onChange={handleChange}
                   className={inputClass}
-                  placeholder="Thành phố, tiểu bang"
+                  placeholder="City, State"
                   aria-invalid={!!errors.address}
                 />
                 {errors.address && <p className={errorClass}>{errors.address}</p>}
@@ -570,13 +569,12 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
             </div>
           </section>
 
-          {/* B. Job interest */}
           <section className="space-y-4">
-            <SectionHeading>B. Nguyện vọng công việc</SectionHeading>
+            <SectionHeading>B. Role Preferences</SectionHeading>
 
             <div ref={(el) => { fieldRefs.current.interestedPosition = el; }}>
               <label htmlFor="career-interestedPosition" className={labelClass}>
-                Lĩnh vực / vị trí quan tâm <span className="text-red-500">*</span>
+                Area of Interest <span className="text-red-500">*</span>
               </label>
               <select
                 id="career-interestedPosition"
@@ -586,7 +584,7 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
                 className={inputClass}
                 aria-invalid={!!errors.interestedPosition}
               >
-                <option value="">Chọn lĩnh vực / vị trí</option>
+                <option value="">Select an area of interest</option>
                 {POSITION_OPTIONS.map((opt) => (
                   <option key={opt} value={opt}>{opt}</option>
                 ))}
@@ -596,10 +594,10 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
               )}
             </div>
 
-            <ConditionalField show={formData.interestedPosition === 'Khác'}>
+            <ConditionalField show={formData.interestedPosition === 'Other'}>
               <div ref={(el) => { fieldRefs.current.interestedPositionOther = el; }}>
                 <label htmlFor="career-interestedPositionOther" className={labelClass}>
-                  Vị trí mong muốn <span className="text-red-500">*</span>
+                  Preferred Role <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -608,7 +606,7 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
                   value={formData.interestedPositionOther}
                   onChange={handleChange}
                   className={inputClass}
-                  placeholder="Nhập vị trí bạn quan tâm"
+                  placeholder="Tell us the role you're interested in"
                   aria-invalid={!!errors.interestedPositionOther}
                 />
                 {errors.interestedPositionOther && (
@@ -619,7 +617,7 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
 
             <div ref={(el) => { fieldRefs.current.preferredBranch = el; }}>
               <label htmlFor="career-preferredBranch" className={labelClass}>
-                Khu vực / chi nhánh mong muốn làm việc <span className="text-red-500">*</span>
+                Preferred Location / Branch <span className="text-red-500">*</span>
               </label>
               <select
                 id="career-preferredBranch"
@@ -629,7 +627,7 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
                 className={inputClass}
                 aria-invalid={!!errors.preferredBranch}
               >
-                <option value="">Chọn khu vực / chi nhánh</option>
+                <option value="">Select a location / branch</option>
                 {BRANCH_OPTIONS.map((opt) => (
                   <option key={opt} value={opt}>{opt}</option>
                 ))}
@@ -639,12 +637,12 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
 
             <div ref={(el) => { fieldRefs.current.employmentType = el; }}>
               <span className={labelClass}>
-                Loại hình mong muốn <span className="text-red-500">*</span>
+                Employment Type <span className="text-red-500">*</span>
               </span>
               <RadioPills
                 name="employmentType"
                 value={formData.employmentType}
-                options={['Full-time', 'Part-time', 'Thực tập']}
+                options={['Full-time', 'Part-time', 'Internship']}
                 onChange={handleRadioChange}
                 required
                 error={errors.employmentType}
@@ -653,7 +651,7 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
 
             <div>
               <label htmlFor="career-expectedSalary" className={labelClass}>
-                Mức lương mong muốn
+                Expected Salary
               </label>
               <input
                 type="text"
@@ -662,13 +660,13 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
                 value={formData.expectedSalary}
                 onChange={handleChange}
                 className={inputClass}
-                placeholder="VD: $20 / hour"
+                placeholder="e.g. $20 / hour"
               />
             </div>
 
             <div ref={(el) => { fieldRefs.current.availableStartDate = el; }}>
               <label htmlFor="career-availableStartDate" className={labelClass}>
-                Thời gian có thể bắt đầu <span className="text-red-500">*</span>
+                Earliest Start Date <span className="text-red-500">*</span>
               </label>
               <input
                 type="date"
@@ -685,13 +683,12 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
             </div>
           </section>
 
-          {/* C. Experience */}
           <section className="space-y-4">
-            <SectionHeading>C. Kinh nghiệm &amp; học vấn</SectionHeading>
+            <SectionHeading>C. Experience &amp; Education</SectionHeading>
 
             <div ref={(el) => { fieldRefs.current.education = el; }}>
               <label htmlFor="career-education" className={labelClass}>
-                Trình độ học vấn <span className="text-red-500">*</span>
+                Education Level <span className="text-red-500">*</span>
               </label>
               <select
                 id="career-education"
@@ -701,7 +698,7 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
                 className={inputClass}
                 aria-invalid={!!errors.education}
               >
-                <option value="">Chọn trình độ</option>
+                <option value="">Select education level</option>
                 {EDUCATION_OPTIONS.map((opt) => (
                   <option key={opt} value={opt}>{opt}</option>
                 ))}
@@ -711,12 +708,12 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
 
             <div ref={(el) => { fieldRefs.current.yearsOfExperience = el; }}>
               <span className={labelClass}>
-                Số năm kinh nghiệm <span className="text-red-500">*</span>
+                Years of Experience <span className="text-red-500">*</span>
               </span>
               <RadioPills
                 name="yearsOfExperience"
                 value={formData.yearsOfExperience}
-                options={['Chưa có', 'Dưới 1 năm', '1-3 năm', 'Trên 3 năm']}
+                options={['None', 'Less than 1 year', '1-3 years', 'More than 3 years']}
                 onChange={handleRadioChange}
                 required
                 error={errors.yearsOfExperience}
@@ -725,7 +722,7 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
 
             <div>
               <label htmlFor="career-lastWorkplace" className={labelClass}>
-                Nơi làm việc gần nhất + vị trí
+                Most Recent Employer &amp; Position
               </label>
               <input
                 type="text"
@@ -734,13 +731,13 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
                 value={formData.lastWorkplace}
                 onChange={handleChange}
                 className={inputClass}
-                placeholder="Tên công ty — vị trí"
+                placeholder="Company name — role"
               />
             </div>
 
             <div>
               <label htmlFor="career-experienceDescription" className={labelClass}>
-                Giới thiệu ngắn về bản thân &amp; kinh nghiệm liên quan
+                Tell us about yourself and any relevant experience
               </label>
               <textarea
                 id="career-experienceDescription"
@@ -749,23 +746,22 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
                 onChange={handleChange}
                 rows={4}
                 className={`${inputClass} resize-none`}
-                placeholder="Chia sẻ ngắn về bản thân và kinh nghiệm liên quan..."
+                placeholder="Share a short introduction and any relevant experience..."
               />
             </div>
           </section>
 
-          {/* D. Additional */}
           <section className="space-y-4">
-            <SectionHeading>D. Thông tin bổ sung</SectionHeading>
+            <SectionHeading>D. Additional Information</SectionHeading>
 
             <div ref={(el) => { fieldRefs.current.canWorkNightsWeekends = el; }}>
               <span className={labelClass}>
-                Có thể làm ca tối / cuối tuần? <span className="text-red-500">*</span>
+                Available for evening / weekend shifts? <span className="text-red-500">*</span>
               </span>
               <RadioPills
                 name="canWorkNightsWeekends"
                 value={formData.canWorkNightsWeekends}
-                options={['Có', 'Không']}
+                options={['Yes', 'No']}
                 onChange={handleRadioChange}
                 required
                 error={errors.canWorkNightsWeekends}
@@ -774,12 +770,12 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
 
             <div ref={(el) => { fieldRefs.current.hasFnBExperience = el; }}>
               <span className={labelClass}>
-                Đã từng làm F&amp;B? <span className="text-red-500">*</span>
+                Previous F&amp;B experience? <span className="text-red-500">*</span>
               </span>
               <RadioPills
                 name="hasFnBExperience"
                 value={formData.hasFnBExperience}
-                options={['Có', 'Không']}
+                options={['Yes', 'No']}
                 onChange={handleRadioChange}
                 required
                 error={errors.hasFnBExperience}
@@ -788,7 +784,7 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
 
             <div ref={(el) => { fieldRefs.current.hearAboutUs = el; }}>
               <label htmlFor="career-hearAboutUs" className={labelClass}>
-                Biết đến King Banh Mi qua đâu? <span className="text-red-500">*</span>
+                How did you hear about us? <span className="text-red-500">*</span>
               </label>
               <select
                 id="career-hearAboutUs"
@@ -798,7 +794,7 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
                 className={inputClass}
                 aria-invalid={!!errors.hearAboutUs}
               >
-                <option value="">Chọn nguồn</option>
+                <option value="">Select a source</option>
                 {HEAR_ABOUT_OPTIONS.map((opt) => (
                   <option key={opt} value={opt}>{opt}</option>
                 ))}
@@ -808,7 +804,7 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
 
             <div ref={(el) => { fieldRefs.current.cv = el; }}>
               <label htmlFor="career-cv" className={labelClass}>
-                Upload CV
+                Upload CV / Resume
               </label>
               <input
                 ref={fileInputRef}
@@ -821,7 +817,7 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
                 aria-invalid={!!errors.cv}
               />
               <p className="mt-1 text-xs text-[#4a5565]">
-                Khuyến khích đính kèm CV (.pdf / .doc / .docx, tối đa 5MB)
+                Optional but encouraged — PDF, DOC, or DOCX up to 5MB
               </p>
               {cvFile && (
                 <div className="mt-3 flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">
@@ -831,7 +827,7 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
                     type="button"
                     onClick={clearCv}
                     className="p-2 rounded-lg hover:bg-gray-200 text-[#013a0f] min-h-11 min-w-11 inline-flex items-center justify-center"
-                    aria-label="Xóa file CV"
+                    aria-label="Remove CV file"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -842,7 +838,7 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
 
             <div>
               <label htmlFor="career-notes" className={labelClass}>
-                Ghi chú thêm
+                Additional Notes
               </label>
               <textarea
                 id="career-notes"
@@ -851,7 +847,7 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
                 onChange={handleChange}
                 rows={3}
                 className={`${inputClass} resize-none`}
-                placeholder="Thông tin bổ sung bạn muốn chia sẻ..."
+                placeholder="Anything else you'd like us to know..."
               />
             </div>
 
@@ -874,8 +870,8 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
                 aria-invalid={!!errors.privacyConsent}
               />
               <span className="text-sm text-[#013a0f] leading-relaxed">
-                Tôi đồng ý cho phép King Banh Mi lưu trữ và xử lý thông tin cá nhân phục vụ mục đích
-                tuyển dụng. <span className="text-red-500">*</span>
+                I agree to allow King Banh Mi to store my personal information for recruitment
+                purposes. <span className="text-red-500">*</span>
               </span>
             </label>
             {errors.privacyConsent && <p className={errorClass}>{errors.privacyConsent}</p>}
@@ -894,12 +890,12 @@ export const CareerForm = forwardRef<CareerFormHandle>(function CareerForm(_, re
                   className="w-5 h-5 border-2 border-[#013a0f] border-t-transparent rounded-full animate-spin"
                   aria-hidden="true"
                 ></div>
-                <span>ĐANG GỬI...</span>
+                <span>SUBMITTING...</span>
               </>
             ) : (
               <>
                 <Send className="w-5 h-5" aria-hidden="true" />
-                <span>GỬI HỒ SƠ ỨNG TUYỂN</span>
+                <span>SUBMIT APPLICATION</span>
               </>
             )}
           </motion.button>
