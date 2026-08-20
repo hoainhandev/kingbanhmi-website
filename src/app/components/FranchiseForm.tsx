@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { useState } from 'react';
 import { Send } from 'lucide-react';
+import { GOOGLE_SCRIPT_URL } from '../config/forms';
 
 const WHAT_ATTRACTS_OPTIONS = [
   'Vietnamese food concept',
@@ -167,7 +168,7 @@ export function FranchiseForm() {
     setIsSubmitting(true);
 
     try {
-      const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
+      const scriptUrl = GOOGLE_SCRIPT_URL;
 
       if (!scriptUrl) {
         console.warn('Google Script URL not found. Running in demo mode.');

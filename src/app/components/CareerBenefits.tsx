@@ -3,28 +3,28 @@ import { Heart, Users, GraduationCap, TrendingUp } from 'lucide-react';
 
 const benefits = [
   {
-    icon: Heart,
-    title: 'Văn hóa ấm áp',
+    icon: Users,
+    title: 'Môi trường trẻ trung',
     description:
-      'Làm việc trong môi trường tôn trọng, hỗ trợ lẫn nhau — đúng tinh thần gia đình Việt.',
+      'Làm việc cùng đội ngũ năng động, thân thiện — nơi mỗi ngày mang hương vị Việt đến khách hàng.',
   },
   {
     icon: GraduationCap,
-    title: 'Đào tạo chuyên sâu',
+    title: 'Đào tạo bài bản',
     description:
-      'Được hướng dẫn quy trình, công thức và kỹ năng phục vụ theo chuẩn thương hiệu.',
+      'Được hướng dẫn quy trình, công thức và kỹ năng phục vụ theo chuẩn thương hiệu King Banh Mi.',
   },
   {
     icon: TrendingUp,
-    title: 'Cơ hội phát triển',
+    title: 'Lộ trình thăng tiến',
     description:
-      'Lộ trình rõ ràng từ nhân viên đến trưởng ca / quản lý khi bạn sẵn sàng.',
+      'Cơ hội phát triển từ nhân viên đến trưởng ca / quản lý khi bạn sẵn sàng đảm nhận.',
   },
   {
-    icon: Users,
-    title: 'Đội ngũ gắn kết',
+    icon: Heart,
+    title: 'Chế độ phúc lợi',
     description:
-      'Cùng nhau phục vụ món ăn Việt authentic cho cộng đồng yêu thương King Banh Mi.',
+      'Lương cạnh tranh theo năng lực, hỗ trợ ca làm việc linh hoạt và môi trường tôn trọng lẫn nhau.',
   },
 ];
 
@@ -35,18 +35,20 @@ export function CareerBenefits() {
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
       viewport={{ once: true }}
+      aria-labelledby="career-benefits-heading"
     >
       <div className="mb-8">
         <h2
+          id="career-benefits-heading"
           className="text-3xl md:text-4xl font-bold text-[#013a0f] mb-4"
           style={{ letterSpacing: '1.5px' }}
         >
-          VÌ SAO LÀM VIỆC TẠI KING BANH MI
+          VÌ SAO CHỌN KING BANH MI
         </h2>
-        <div className="w-20 h-1 bg-[#FDB714] mb-4"></div>
+        <div className="w-20 h-1 bg-[#FDB714] mb-4" aria-hidden="true"></div>
         <p className="text-lg text-[#4a5565] leading-relaxed max-w-2xl">
-          Chúng tôi xây dựng đội ngũ bằng sự chân thành — mỗi ngày là cơ hội phục vụ
-          hương vị Việt và phát triển bản thân.
+          Chúng tôi xây dựng đội ngũ bằng sự chân thành — gửi hồ sơ để được ghi nhận vào talent
+          pool, và liên hệ khi có vị trí phù hợp.
         </p>
       </div>
 

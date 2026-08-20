@@ -83,7 +83,7 @@ export function Footer() {
                     to="/career"
                     className="text-gray-300 hover:text-[#FDB714] transition-colors text-sm"
                   >
-                    Tuyển dụng / Careers
+                    Tuyển dụng
                   </Link>
                 </motion.div>
               </li>

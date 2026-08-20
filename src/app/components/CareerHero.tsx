@@ -11,7 +11,7 @@ export function CareerHero({ onApplyClick }: CareerHeroProps) {
       <div className="absolute inset-0">
         <ImageWithFallback
           src="https://images.unsplash.com/photo-1559339352-11d035aa65de?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
-          alt="King Banh Mi careers"
+          alt="Gia nhập đội ngũ King Banh Mi"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#013a0f]/95 to-[#013a0f]/70"></div>
@@ -25,13 +25,13 @@ export function CareerHero({ onApplyClick }: CareerHeroProps) {
           transition={{ duration: 0.8 }}
         >
           <motion.h1
-            className="text-5xl md:text-7xl font-bold text-white mb-6"
+            className="text-4xl sm:text-5xl md:text-7xl font-bold text-white mb-6"
             style={{ letterSpacing: '2px' }}
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            CAREERS AT
+            GIA NHẬP ĐỘI NGŨ
             <span className="text-[#FDB714] block mt-2">KING BANH MI</span>
           </motion.h1>
 
@@ -43,13 +43,13 @@ export function CareerHero({ onApplyClick }: CareerHeroProps) {
           />
 
           <motion.p
-            className="text-xl text-gray-200 leading-relaxed mb-8"
+            className="text-lg md:text-xl text-gray-200 leading-relaxed mb-8"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            Gia nhập đội ngũ King Banh Mi — nơi hương vị Việt được phục vụ bằng tâm huyết,
-            và mỗi thành viên đều được phát triển cùng thương hiệu.
+            Chúng tôi luôn chào đón ứng viên tiềm năng. Gửi hồ sơ ngay hôm nay — khi có vị trí
+            phù hợp, đội ngũ tuyển dụng sẽ liên hệ với bạn.
           </motion.p>
 
           <motion.div
@@ -65,28 +65,28 @@ export function CareerHero({ onApplyClick }: CareerHeroProps) {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              ỨNG TUYỂN NGAY
+              GỬI HỒ SƠ NGAY
             </motion.button>
             <div className="flex flex-wrap gap-6">
               <div className="flex items-center space-x-2 text-white">
-                <div className="w-2 h-2 bg-[#FDB714] rounded-full"></div>
-                <span className="text-sm font-medium">Môi trường năng động</span>
+                <div className="w-2 h-2 bg-[#FDB714] rounded-full" aria-hidden="true"></div>
+                <span className="text-sm font-medium">Talent pool mở</span>
               </div>
               <div className="flex items-center space-x-2 text-white">
-                <div className="w-2 h-2 bg-[#FDB714] rounded-full"></div>
+                <div className="w-2 h-2 bg-[#FDB714] rounded-full" aria-hidden="true"></div>
                 <span className="text-sm font-medium">Đào tạo bài bản</span>
               </div>
               <div className="flex items-center space-x-2 text-white">
-                <div className="w-2 h-2 bg-[#FDB714] rounded-full"></div>
-                <span className="text-sm font-medium">Cơ hội thăng tiến</span>
+                <div className="w-2 h-2 bg-[#FDB714] rounded-full" aria-hidden="true"></div>
+                <span className="text-sm font-medium">Cơ hội phát triển</span>
               </div>
             </div>
           </motion.div>
         </motion.div>
       </div>
 
-      <div className="absolute top-0 right-0 w-96 h-96 bg-[#FDB714] opacity-10 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#FDB714] opacity-10 rounded-full blur-3xl"></div>
+      <div className="absolute top-0 right-0 w-96 h-96 bg-[#FDB714] opacity-10 rounded-full blur-3xl" aria-hidden="true"></div>
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#FDB714] opacity-10 rounded-full blur-3xl" aria-hidden="true"></div>
     </section>
   );
 }

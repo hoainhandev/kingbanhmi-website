@@ -115,7 +115,7 @@ export function Header() {
                   location.pathname === '/career' ? 'text-[#FCAF15]' : 'text-[#fbfbfb] hover:text-[#FCAF15]'
                 }`}
               >
-                CAREERS
+                TUYỂN DỤNG
               </Link>
             </motion.div>
           </nav>
@@ -236,7 +236,7 @@ export function Header() {
                   className="block w-full text-left py-2 text-white hover:text-[#FCAF15] transition-colors text-sm tracking-wide font-medium"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  CAREERS
+                  TUYỂN DỤNG
                 </Link>
               </motion.div>
               

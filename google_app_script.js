@@ -1,13 +1,33 @@
+/**
+ * King Banh Mi — Google Apps Script (Franchise + Career forms)
+ *
+ * Deploy as Web App. Frontend posts FormData with formType = "franchise" | "career".
+ *
+ * Optional one-time setup in Apps Script editor:
+ *   setupCareerHeaderRow()
+ */
+
+var CONFIG = {
+  // Change this to your HR / recruiting inbox before deploy
+  HR_NOTIFY_EMAIL: 'info@kingbanhmi.net',
+  CAREER_SHEET_NAME: 'Career',
+  FRANCHISE_SHEET_NAME: 'Franchise',
+  CV_FOLDER_NAME: 'King Banh Mi - CV',
+  BRAND_GREEN: '#013a0f',
+  BRAND_YELLOW: '#FDB714',
+  LOGO_URL: 'https://www.kingbanhmi.net/logo.png'
+};
+
 function doPost(e) {
   try {
     var params = (e && e.parameter) || {};
     var formType = params.formType || 'franchise';
 
     if (formType === 'career') {
-      return handleCareerPost(params);
+      return handleCareer(params);
     }
 
-    return handleFranchisePost(params);
+    return handleFranchise(params);
   } catch (error) {
     return ContentService
       .createTextOutput(JSON.stringify({ result: 'error', error: error.toString() }))
@@ -20,12 +40,61 @@ function getSheetByNameOrActive(preferredName) {
   if (preferredName) {
     var named = ss.getSheetByName(preferredName);
     if (named) return named;
+    // Create Career sheet automatically if missing
+    if (preferredName === CONFIG.CAREER_SHEET_NAME) {
+      var created = ss.insertSheet(preferredName);
+      setupCareerHeaderRow_(created);
+      return created;
+    }
   }
   return ss.getActiveSheet();
 }
 
-function handleFranchisePost(params) {
-  var sheet = getSheetByNameOrActive('Franchise');
+/** Public: run once from Apps Script editor to style Career header row. */
+function setupCareerHeaderRow() {
+  var sheet = getSheetByNameOrActive(CONFIG.CAREER_SHEET_NAME);
+  setupCareerHeaderRow_(sheet);
+}
+
+function setupCareerHeaderRow_(sheet) {
+  var headers = [
+    'Timestamp',
+    'Full Name',
+    'Date of Birth',
+    'Gender',
+    'Phone',
+    'Email',
+    'Address',
+    'Interested Position',
+    'Position Other',
+    'Preferred Branch',
+    'Employment Type',
+    'Expected Salary',
+    'Available Start Date',
+    'Education',
+    'Years of Experience',
+    'Last Workplace',
+    'Experience Description',
+    'Nights/Weekends',
+    'F&B Experience',
+    'Hear About Us',
+    'Notes',
+    'Privacy Consent',
+    'CV File Name',
+    'CV Link'
+  ];
+
+  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+  sheet.getRange(1, 1, 1, headers.length)
+    .setBackground(CONFIG.BRAND_GREEN)
+    .setFontColor('#ffffff')
+    .setFontWeight('bold');
+  sheet.setFrozenRows(1);
+  sheet.autoResizeColumns(1, headers.length);
+}
+
+function handleFranchise(params) {
+  var sheet = getSheetByNameOrActive(CONFIG.FRANCHISE_SHEET_NAME);
 
   var fullName = params.fullName || '';
   var phone = params.phone || '';
@@ -65,7 +134,6 @@ function handleFranchisePost(params) {
 
   var timestamp = new Date();
 
-  // Column order: Timestamp + franchise fields (see previous header comments A–AJ)
   sheet.appendRow([
     timestamp,
     fullName,
@@ -119,7 +187,7 @@ function handleFranchisePost(params) {
   } catch (emailError) {
     response.emailSent = false;
     response.emailError = emailError.toString();
-    Logger.log('Auto-reply email failed: ' + emailError.toString());
+    Logger.log('Franchise auto-reply failed: ' + emailError.toString());
   }
 
   return ContentService
@@ -127,8 +195,13 @@ function handleFranchisePost(params) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-function handleCareerPost(params) {
-  var sheet = getSheetByNameOrActive('Career');
+function handleCareer(params) {
+  var sheet = getSheetByNameOrActive(CONFIG.CAREER_SHEET_NAME);
+
+  // Ensure header exists if sheet was empty
+  if (sheet.getLastRow() === 0) {
+    setupCareerHeaderRow_(sheet);
+  }
 
   var fullName = params.fullName || '';
   var dateOfBirth = params.dateOfBirth || '';
@@ -136,7 +209,8 @@ function handleCareerPost(params) {
   var phone = params.phone || '';
   var email = params.email || '';
   var address = params.address || '';
-  var position = params.position || '';
+  var interestedPosition = params.interestedPosition || '';
+  var interestedPositionOther = params.interestedPositionOther || '';
   var preferredBranch = params.preferredBranch || '';
   var employmentType = params.employmentType || '';
   var expectedSalary = params.expectedSalary || '';
@@ -155,41 +229,21 @@ function handleCareerPost(params) {
   var fileBase64 = params.fileBase64 || '';
 
   var timestamp = new Date();
-  var cvUrl = '';
+  var cvUrl = '—';
+  var storedFileName = '—';
 
   if (fileBase64 && fileName) {
     try {
-      cvUrl = saveCareerCvToDrive(fileName, mimeType, fileBase64, fullName);
+      var saved = saveCareerCvToDrive(fileName, mimeType, fileBase64, fullName);
+      cvUrl = saved.url;
+      storedFileName = saved.name;
     } catch (cvError) {
       Logger.log('CV save failed: ' + cvError.toString());
       cvUrl = 'CV_SAVE_ERROR: ' + cvError.toString();
+      storedFileName = fileName;
     }
   }
 
-  // Career sheet columns:
-  // A: Timestamp
-  // B: fullName
-  // C: dateOfBirth
-  // D: gender
-  // E: phone
-  // F: email
-  // G: address
-  // H: position
-  // I: preferredBranch
-  // J: employmentType
-  // K: expectedSalary
-  // L: availableStartDate
-  // M: education
-  // N: yearsOfExperience
-  // O: lastWorkplace
-  // P: experienceDescription
-  // Q: canWorkNightsWeekends
-  // R: hasFnBExperience
-  // S: hearAboutUs
-  // T: notes
-  // U: privacyConsent
-  // V: cvFileName
-  // W: cvUrl
   sheet.appendRow([
     timestamp,
     fullName,
@@ -198,7 +252,8 @@ function handleCareerPost(params) {
     phone,
     email,
     address,
-    position,
+    interestedPosition,
+    interestedPositionOther,
     preferredBranch,
     employmentType,
     expectedSalary,
@@ -212,16 +267,21 @@ function handleCareerPost(params) {
     hearAboutUs,
     notes,
     privacyConsent,
-    fileName,
+    storedFileName,
     cvUrl
   ]);
 
   var rowNumber = sheet.getLastRow();
-  var response = { result: 'success', formType: 'career', row: rowNumber, cvUrl: cvUrl };
+  var response = {
+    result: 'success',
+    formType: 'career',
+    row: rowNumber,
+    cvUrl: cvUrl
+  };
 
   try {
     if (email) {
-      sendCareerAutoReplyEmail(email, fullName, position);
+      sendCareerAutoReplyEmail(email, fullName, interestedPosition, interestedPositionOther);
       response.emailSent = true;
     } else {
       response.emailSent = false;
@@ -230,7 +290,27 @@ function handleCareerPost(params) {
   } catch (emailError) {
     response.emailSent = false;
     response.emailError = emailError.toString();
-    Logger.log('Career auto-reply email failed: ' + emailError.toString());
+    Logger.log('Career auto-reply failed: ' + emailError.toString());
+  }
+
+  try {
+    if (CONFIG.HR_NOTIFY_EMAIL) {
+      sendCareerHrNotifyEmail({
+        fullName: fullName,
+        email: email,
+        phone: phone,
+        interestedPosition: interestedPosition,
+        interestedPositionOther: interestedPositionOther,
+        preferredBranch: preferredBranch,
+        employmentType: employmentType,
+        cvUrl: cvUrl
+      });
+      response.hrNotified = true;
+    }
+  } catch (hrError) {
+    response.hrNotified = false;
+    response.hrError = hrError.toString();
+    Logger.log('HR notify failed: ' + hrError.toString());
   }
 
   return ContentService
@@ -239,71 +319,124 @@ function handleCareerPost(params) {
 }
 
 function saveCareerCvToDrive(fileName, mimeType, fileBase64, applicantName) {
-  var folderName = 'KingBanhMi_Career_CVs';
-  var folders = DriveApp.getFoldersByName(folderName);
-  var folder = folders.hasNext() ? folders.next() : DriveApp.createFolder(folderName);
+  var folders = DriveApp.getFoldersByName(CONFIG.CV_FOLDER_NAME);
+  var folder = folders.hasNext() ? folders.next() : DriveApp.createFolder(CONFIG.CV_FOLDER_NAME);
+
+  var ext = '';
+  var match = String(fileName).match(/(\.[a-zA-Z0-9]+)$/);
+  if (match) ext = match[1];
+
+  var safeName = String(applicantName || 'Applicant')
+    .replace(/[^\w\s.-]/g, '')
+    .replace(/\s+/g, '_')
+    .trim() || 'Applicant';
+  var dateStamp = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyyMMdd');
+  var stampedName = safeName + '_' + dateStamp + ext;
 
   var blob = Utilities.newBlob(
     Utilities.base64Decode(fileBase64),
     mimeType || 'application/octet-stream',
-    fileName
+    stampedName
   );
-
-  var safeApplicant = (applicantName || 'applicant').replace(/[^\w\s.-]/g, '').trim() || 'applicant';
-  var stampedName = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyyMMdd_HHmmss') +
-    '_' + safeApplicant + '_' + fileName;
-  blob.setName(stampedName);
 
   var file = folder.createFile(blob);
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-  return file.getUrl();
+  return { url: file.getUrl(), name: stampedName };
 }
 
-function sendCareerAutoReplyEmail(toEmail, fullName, position) {
-  var displayName = fullName || 'Ứng viên';
-  var safeName = escapeHtml(displayName);
-  var safePosition = escapeHtml(position || 'vị trí đã chọn');
-  var subject = 'Cảm ơn bạn đã ứng tuyển tại King Banh Mi';
-
-  var htmlBody =
+function buildBrandedEmailShell(bannerTitle, bodyHtml, footerLabel) {
+  return (
     '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f4f4; margin:0; padding:24px 0;">' +
       '<tr>' +
         '<td align="center" style="padding:0;">' +
           '<table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px; width:100%; background-color:#ffffff; border:1px solid #e0e0e0;">' +
             '<tr>' +
-              '<td bgcolor="#013a0f" align="center" style="background-color:#013a0f; padding:32px 24px; text-align:center;">' +
-                '<img src="https://www.kingbanhmi.net/logo.png" alt="King Banh Mi" width="120" height="60" style="display:block; margin:0 auto 16px auto; border:0;" />' +
-                '<p style="margin:0 0 8px 0; color:#FDB714; font-size:22px; font-weight:bold; letter-spacing:1px; text-transform:uppercase; font-family:Arial,Helvetica,sans-serif;">CAREERS</p>' +
-                '<p style="margin:0; color:#ffffff; font-size:13px; font-style:italic; font-family:Arial,Helvetica,sans-serif;">Born in Vietnam, Craved Everywhere.</p>' +
+              '<td bgcolor="' + CONFIG.BRAND_GREEN + '" align="center" style="background-color:' + CONFIG.BRAND_GREEN + '; padding:32px 24px; text-align:center;">' +
+                '<img src="' + CONFIG.LOGO_URL + '" alt="King Banh Mi" width="80" height="80" style="display:block; margin:0 auto 16px auto; border:0; outline:none; text-decoration:none;" />' +
+                '<p style="margin:0 0 8px 0; color:' + CONFIG.BRAND_YELLOW + '; font-size:22px; font-weight:bold; letter-spacing:1px; text-transform:uppercase; font-family:Arial,Helvetica,sans-serif; line-height:1.3;">' + bannerTitle + '</p>' +
+                '<p style="margin:0; color:#ffffff; font-size:13px; font-style:italic; font-family:Arial,Helvetica,sans-serif; line-height:1.4;">Born in Vietnam, Craved Everywhere.</p>' +
               '</td>' +
             '</tr>' +
             '<tr>' +
-              '<td bgcolor="#FDB714" style="background-color:#FDB714; height:6px; line-height:6px; font-size:1px;">&nbsp;</td>' +
+              '<td bgcolor="' + CONFIG.BRAND_YELLOW + '" style="background-color:' + CONFIG.BRAND_YELLOW + '; height:6px; line-height:6px; font-size:1px; padding:0;">&nbsp;</td>' +
             '</tr>' +
-            '<tr>' +
-              '<td style="padding:32px; font-family:Arial,Helvetica,sans-serif; color:#333333; font-size:15px; line-height:1.6;">' +
-                '<p style="margin:0 0 16px 0; color:#013a0f;">Dear ' + safeName + ',</p>' +
-                '<p style="margin:0 0 16px 0;">Cảm ơn bạn đã gửi hồ sơ ứng tuyển vị trí <strong style="color:#013a0f;">' + safePosition + '</strong> tại <strong style="color:#013a0f;">King Banh Mi</strong>.</p>' +
-                '<p style="margin:0 0 16px 0;">Đội ngũ tuyển dụng của chúng tôi đã nhận được thông tin và sẽ xem xét hồ sơ. Nếu phù hợp, chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất.</p>' +
-                '<p style="margin:0 0 16px 0;">Best regards,</p>' +
-                '<p style="margin:0 0 4px 0; color:#013a0f; font-weight:bold;">King Banh Mi Careers Team</p>' +
-                '<p style="margin:0; color:#013a0f; font-weight:bold;">Born in Vietnam, Craved Everywhere.</p>' +
-              '</td>' +
-            '</tr>' +
+            bodyHtml +
           '</table>' +
-          '<table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px; width:100%;">' +
+          '<table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px; width:100%; margin-top:0;">' +
             '<tr>' +
-              '<td align="center" style="padding:16px 12px; font-family:Arial,Helvetica,sans-serif; color:#999999; font-size:12px; background-color:#f5f5f5;">' +
-                'KING BANH MI &nbsp;|&nbsp; Born in Vietnam, Craved Everywhere. &nbsp;|&nbsp; Careers' +
+              '<td align="center" style="padding:16px 12px; text-align:center; font-family:Arial,Helvetica,sans-serif; color:#999999; font-size:12px; line-height:1.5; background-color:#f5f5f5;">' +
+                'KING BANH MI &nbsp;|&nbsp; Born in Vietnam, Craved Everywhere. &nbsp;|&nbsp; ' + footerLabel +
               '</td>' +
             '</tr>' +
           '</table>' +
         '</td>' +
       '</tr>' +
-    '</table>';
+    '</table>'
+  );
+}
+
+function sendCareerAutoReplyEmail(toEmail, fullName, interestedPosition, interestedPositionOther) {
+  var displayName = fullName || 'Ứng viên';
+  var safeName = escapeHtml(displayName);
+  var positionLabel = interestedPosition === 'Khác' && interestedPositionOther
+    ? interestedPositionOther
+    : (interestedPosition || 'talent pool');
+  var safePosition = escapeHtml(positionLabel);
+  var subject = 'Cảm ơn bạn đã gửi hồ sơ tới King Banh Mi';
+
+  var bodyHtml =
+    '<tr>' +
+      '<td style="padding:32px 32px 8px 32px; font-family:Arial,Helvetica,sans-serif; color:#333333; font-size:15px; line-height:1.6;">' +
+        '<p style="margin:0 0 16px 0; color:' + CONFIG.BRAND_GREEN + '; font-size:15px; line-height:1.6;">Dear ' + safeName + ',</p>' +
+        '<p style="margin:0 0 16px 0; color:#333333; font-size:15px; line-height:1.6;">Cảm ơn bạn đã gửi hồ sơ ứng tuyển tới <strong style="color:' + CONFIG.BRAND_GREEN + ';">King Banh Mi</strong>. Chúng tôi đã ghi nhận thông tin của bạn vào talent pool' +
+        (safePosition ? ' cho lĩnh vực / vị trí <strong style="color:' + CONFIG.BRAND_GREEN + ';">' + safePosition + '</strong>' : '') + '.</p>' +
+        '<p style="margin:0 0 16px 0; color:#333333; font-size:15px; line-height:1.6;">Khi có vị trí phù hợp, đội ngũ tuyển dụng sẽ liên hệ với bạn trong thời gian sớm nhất.</p>' +
+        '<p style="margin:0; color:#333333; font-size:15px; line-height:1.6;">Chúng tôi rất mong được đồng hành cùng bạn.</p>' +
+      '</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td style="padding:8px 32px 32px 32px; font-family:Arial,Helvetica,sans-serif; font-size:15px; line-height:1.6;">' +
+        '<p style="margin:0 0 8px 0; color:#333333; font-size:15px; line-height:1.6;">Best regards,</p>' +
+        '<p style="margin:0 0 4px 0; color:' + CONFIG.BRAND_GREEN + '; font-size:15px; font-weight:bold; line-height:1.6;">King Banh Mi Careers Team</p>' +
+        '<p style="margin:0 0 20px 0; color:' + CONFIG.BRAND_GREEN + '; font-size:15px; font-weight:bold; line-height:1.6;">Born in Vietnam, Craved Everywhere.</p>' +
+        '<table cellpadding="0" cellspacing="0" border="0" style="margin:0;">' +
+          '<tr>' +
+            '<td align="center" bgcolor="' + CONFIG.BRAND_YELLOW + '" style="background-color:' + CONFIG.BRAND_YELLOW + '; border-radius:6px;">' +
+              '<a href="https://www.kingbanhmi.net/career" target="_blank" style="display:inline-block; padding:12px 24px; font-family:Arial,Helvetica,sans-serif; font-size:14px; font-weight:bold; color:' + CONFIG.BRAND_GREEN + '; text-decoration:none; line-height:1.4;">www.kingbanhmi.net/career</a>' +
+            '</td>' +
+          '</tr>' +
+        '</table>' +
+      '</td>' +
+    '</tr>';
 
   MailApp.sendEmail({
     to: toEmail,
+    subject: subject,
+    htmlBody: buildBrandedEmailShell('CAREERS / TUYỂN DỤNG', bodyHtml, 'Careers')
+  });
+}
+
+function sendCareerHrNotifyEmail(info) {
+  var positionLabel = info.interestedPosition === 'Khác' && info.interestedPositionOther
+    ? info.interestedPositionOther
+    : info.interestedPosition;
+  var subject = '[Career] Hồ sơ mới — ' + (info.fullName || 'Ứng viên');
+  var cvLine = info.cvUrl && info.cvUrl !== '—'
+    ? '<p><strong>CV:</strong> <a href="' + escapeHtml(info.cvUrl) + '">' + escapeHtml(info.cvUrl) + '</a></p>'
+    : '<p><strong>CV:</strong> —</p>';
+
+  var htmlBody =
+    '<p>Có hồ sơ ứng tuyển mới vào talent pool.</p>' +
+    '<p><strong>Họ tên:</strong> ' + escapeHtml(info.fullName || '') + '<br>' +
+    '<strong>Email:</strong> ' + escapeHtml(info.email || '') + '<br>' +
+    '<strong>Điện thoại:</strong> ' + escapeHtml(info.phone || '') + '<br>' +
+    '<strong>Vị trí quan tâm:</strong> ' + escapeHtml(positionLabel || '') + '<br>' +
+    '<strong>Chi nhánh:</strong> ' + escapeHtml(info.preferredBranch || '') + '<br>' +
+    '<strong>Loại hình:</strong> ' + escapeHtml(info.employmentType || '') + '</p>' +
+    cvLine;
+
+  MailApp.sendEmail({
+    to: CONFIG.HR_NOTIFY_EMAIL,
     subject: subject,
     htmlBody: htmlBody
   });
@@ -314,59 +447,34 @@ function sendFranchiseAutoReplyEmail(toEmail, fullName) {
   var subject = 'Thank You for Your Interest in King Banh Mi Franchise';
   var safeName = escapeHtml(displayName);
 
-  var htmlBody =
-    '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f4f4; margin:0; padding:24px 0;">' +
-      '<tr>' +
-        '<td align="center" style="padding:0;">' +
-          '<table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px; width:100%; background-color:#ffffff; border:1px solid #e0e0e0;">' +
-            '<tr>' +
-              '<td bgcolor="#013a0f" align="center" style="background-color:#013a0f; padding:32px 24px; text-align:center;">' +
-                '<img src="https://www.kingbanhmi.net/logo.png" alt="King Banh Mi" width="120" height="60" style="display:block; margin:0 auto 16px auto; border:0; outline:none; text-decoration:none;" />' +
-                '<p style="margin:0 0 8px 0; color:#FDB714; font-size:22px; font-weight:bold; letter-spacing:1px; text-transform:uppercase; font-family:Arial,Helvetica,sans-serif; line-height:1.3;">FRANCHISE INQUIRY FORM</p>' +
-                '<p style="margin:0; color:#ffffff; font-size:13px; font-style:italic; font-family:Arial,Helvetica,sans-serif; line-height:1.4;">Born in Vietnam, Craved Everywhere.</p>' +
-              '</td>' +
-            '</tr>' +
-            '<tr>' +
-              '<td bgcolor="#FDB714" style="background-color:#FDB714; height:6px; line-height:6px; font-size:1px; padding:0;">&nbsp;</td>' +
-            '</tr>' +
-            '<tr>' +
-              '<td style="padding:32px 32px 8px 32px; font-family:Arial,Helvetica,sans-serif; color:#333333; font-size:15px; line-height:1.6;">' +
-                '<p style="margin:0 0 16px 0; color:#013a0f; font-size:15px; line-height:1.6;">Dear ' + safeName + ',</p>' +
-                '<p style="margin:0 0 16px 0; color:#333333; font-size:15px; line-height:1.6;">Thank you for your interest in becoming a <strong style="color:#013a0f;">King Banh Mi</strong> franchise partner. We have received your franchise inquiry form. Our franchise development team will review your information and contact you soon to discuss the next steps.</p>' +
-                '<p style="margin:0 0 16px 0; color:#333333; font-size:15px; line-height:1.6;"><strong style="color:#013a0f;">King Banh Mi</strong> is expanding across the United States with a modern Vietnamese fast-casual restaurant and beverage concept built around authentic banh mi sandwiches, Vietnamese coffee, milk tea, sugarcane juice, and specialty beverages.</p>' +
-                '<p style="margin:0; color:#333333; font-size:15px; line-height:1.6;">We look forward to learning more about your goals and market interest.</p>' +
-              '</td>' +
-            '</tr>' +
-            '<tr>' +
-              '<td style="padding:8px 32px 32px 32px; font-family:Arial,Helvetica,sans-serif; font-size:15px; line-height:1.6;">' +
-                '<p style="margin:0 0 8px 0; color:#333333; font-size:15px; line-height:1.6;">Best regards,</p>' +
-                '<p style="margin:0 0 4px 0; color:#013a0f; font-size:15px; font-weight:bold; line-height:1.6;">King Banh Mi Franchise Development Team</p>' +
-                '<p style="margin:0 0 20px 0; color:#013a0f; font-size:15px; font-weight:bold; line-height:1.6;">Born in Vietnam, Craved Everywhere.</p>' +
-                '<table cellpadding="0" cellspacing="0" border="0" style="margin:0;">' +
-                  '<tr>' +
-                    '<td align="center" bgcolor="#FDB714" style="background-color:#FDB714; border-radius:6px;">' +
-                      '<a href="https://www.kingbanhmi.net/franchise" target="_blank" style="display:inline-block; padding:12px 24px; font-family:Arial,Helvetica,sans-serif; font-size:14px; font-weight:bold; color:#013a0f; text-decoration:none; line-height:1.4;">www.kingbanhmi.net/franchise</a>' +
-                    '</td>' +
-                  '</tr>' +
-                '</table>' +
-              '</td>' +
-            '</tr>' +
-          '</table>' +
-          '<table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px; width:100%; margin-top:0;">' +
-            '<tr>' +
-              '<td align="center" style="padding:16px 12px; text-align:center; font-family:Arial,Helvetica,sans-serif; color:#999999; font-size:12px; line-height:1.5; background-color:#f5f5f5;">' +
-                'KING BANH MI &nbsp;|&nbsp; Born in Vietnam, Craved Everywhere. &nbsp;|&nbsp; Franchise Inquiry Form' +
-              '</td>' +
-            '</tr>' +
-          '</table>' +
-        '</td>' +
-      '</tr>' +
-    '</table>';
+  var bodyHtml =
+    '<tr>' +
+      '<td style="padding:32px 32px 8px 32px; font-family:Arial,Helvetica,sans-serif; color:#333333; font-size:15px; line-height:1.6;">' +
+        '<p style="margin:0 0 16px 0; color:' + CONFIG.BRAND_GREEN + '; font-size:15px; line-height:1.6;">Dear ' + safeName + ',</p>' +
+        '<p style="margin:0 0 16px 0; color:#333333; font-size:15px; line-height:1.6;">Thank you for your interest in becoming a <strong style="color:' + CONFIG.BRAND_GREEN + ';">King Banh Mi</strong> franchise partner. We have received your franchise inquiry form. Our franchise development team will review your information and contact you soon to discuss the next steps.</p>' +
+        '<p style="margin:0 0 16px 0; color:#333333; font-size:15px; line-height:1.6;"><strong style="color:' + CONFIG.BRAND_GREEN + ';">King Banh Mi</strong> is expanding across the United States with a modern Vietnamese fast-casual restaurant and beverage concept built around authentic banh mi sandwiches, Vietnamese coffee, milk tea, sugarcane juice, and specialty beverages.</p>' +
+        '<p style="margin:0; color:#333333; font-size:15px; line-height:1.6;">We look forward to learning more about your goals and market interest.</p>' +
+      '</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td style="padding:8px 32px 32px 32px; font-family:Arial,Helvetica,sans-serif; font-size:15px; line-height:1.6;">' +
+        '<p style="margin:0 0 8px 0; color:#333333; font-size:15px; line-height:1.6;">Best regards,</p>' +
+        '<p style="margin:0 0 4px 0; color:' + CONFIG.BRAND_GREEN + '; font-size:15px; font-weight:bold; line-height:1.6;">King Banh Mi Franchise Development Team</p>' +
+        '<p style="margin:0 0 20px 0; color:' + CONFIG.BRAND_GREEN + '; font-size:15px; font-weight:bold; line-height:1.6;">Born in Vietnam, Craved Everywhere.</p>' +
+        '<table cellpadding="0" cellspacing="0" border="0" style="margin:0;">' +
+          '<tr>' +
+            '<td align="center" bgcolor="' + CONFIG.BRAND_YELLOW + '" style="background-color:' + CONFIG.BRAND_YELLOW + '; border-radius:6px;">' +
+              '<a href="https://www.kingbanhmi.net/franchise" target="_blank" style="display:inline-block; padding:12px 24px; font-family:Arial,Helvetica,sans-serif; font-size:14px; font-weight:bold; color:' + CONFIG.BRAND_GREEN + '; text-decoration:none; line-height:1.4;">www.kingbanhmi.net/franchise</a>' +
+            '</td>' +
+          '</tr>' +
+        '</table>' +
+      '</td>' +
+    '</tr>';
 
   MailApp.sendEmail({
     to: toEmail,
     subject: subject,
-    htmlBody: htmlBody
+    htmlBody: buildBrandedEmailShell('FRANCHISE INQUIRY FORM', bodyHtml, 'Franchise Inquiry Form')
   });
 }
 
