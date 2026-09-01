@@ -23,7 +23,7 @@ export function CareerHero({ onApplyClick }: CareerHeroProps) {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
         <div className="relative w-full">
-          <div className="absolute top-0 right-0 z-20">
+          <div className="hidden sm:block absolute top-0 right-0 z-20">
             <CareersLanguageSwitcher />
           </div>
 
@@ -52,13 +52,17 @@ export function CareerHero({ onApplyClick }: CareerHeroProps) {
             />
 
             <motion.p
-              className="text-lg md:text-xl text-gray-200 leading-relaxed mb-8"
+              className="text-lg md:text-xl text-gray-200 leading-relaxed mb-4 sm:mb-8"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.6 }}
             >
               {t.hero.subtitle}
             </motion.p>
+
+            <div className="sm:hidden mb-6">
+              <CareersLanguageSwitcher />
+            </div>
 
             <motion.div
               className="flex flex-wrap items-center gap-6"

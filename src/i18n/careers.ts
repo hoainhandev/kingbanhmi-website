@@ -9,8 +9,8 @@ export const CAREERS_COPY = {
     },
     langSwitcher: {
       label: 'Language',
-      en: 'EN',
-      es: 'ES',
+      en: 'English',
+      es: 'Español',
     },
     hero: {
       titleLine1: 'JOIN THE',
@@ -177,8 +177,8 @@ export const CAREERS_COPY = {
     },
     langSwitcher: {
       label: 'Idioma',
-      en: 'EN',
-      es: 'ES',
+      en: 'English',
+      es: 'Español',
     },
     hero: {
       titleLine1: 'ÚNASE AL',
