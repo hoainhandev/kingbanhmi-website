@@ -1,34 +1,12 @@
 import { motion } from 'motion/react';
 import { Heart, Users, GraduationCap, TrendingUp } from 'lucide-react';
+import { useCareersLang } from '../../i18n/CareersLangContext';
 
-const benefits = [
-  {
-    icon: Users,
-    title: 'Friendly Team Culture',
-    description:
-      'Work alongside a supportive crew that celebrates Vietnamese hospitality and looks out for one another.',
-  },
-  {
-    icon: GraduationCap,
-    title: 'Hands-on Training',
-    description:
-      'Learn our recipes, beverage program, and service standards with structured on-the-job coaching.',
-  },
-  {
-    icon: TrendingUp,
-    title: 'Growth Opportunities',
-    description:
-      'Clear paths from crew to shift lead and store management for team members ready to step up.',
-  },
-  {
-    icon: Heart,
-    title: 'Competitive Benefits',
-    description:
-      'Competitive pay based on experience, flexible scheduling where possible, and a respectful workplace.',
-  },
-];
+const benefitIcons = [Users, GraduationCap, TrendingUp, Heart];
 
 export function CareerBenefits() {
+  const { t } = useCareersLang();
+
   return (
     <motion.section
       initial={{ opacity: 0, y: 30 }}
@@ -43,18 +21,15 @@ export function CareerBenefits() {
           className="text-3xl md:text-4xl font-bold text-[#013a0f] mb-4"
           style={{ letterSpacing: '1.5px' }}
         >
-          WHY WORK WITH US
+          {t.benefits.heading}
         </h2>
         <div className="w-20 h-1 bg-[#FDB714] mb-4" aria-hidden="true"></div>
-        <p className="text-lg text-[#4a5565] leading-relaxed max-w-2xl">
-          Join a brand rooted in authentic Vietnamese flavors. Submit your application to our talent
-          pool and we&apos;ll reach out when a fitting role opens.
-        </p>
+        <p className="text-lg text-[#4a5565] leading-relaxed max-w-2xl">{t.benefits.intro}</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        {benefits.map((benefit, index) => {
-          const Icon = benefit.icon;
+        {t.benefits.items.map((benefit, index) => {
+          const Icon = benefitIcons[index];
           return (
             <motion.div
               key={benefit.title}

@@ -2,6 +2,7 @@
 
 interface ImportMetaEnv {
   readonly VITE_GOOGLE_SCRIPT_URL?: string;
+  readonly VITE_CAREERS_SCRIPT_URL?: string;
 }
 
 interface ImportMeta {

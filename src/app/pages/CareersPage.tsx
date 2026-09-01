@@ -4,17 +4,15 @@ import { Footer } from '../components/Footer';
 import { CareerHero } from '../components/CareerHero';
 import { CareerBenefits } from '../components/CareerBenefits';
 import { CareerForm, type CareerFormHandle } from '../components/CareerForm';
+import { CareersLangProvider, useCareersLang } from '../../i18n/CareersLangContext';
 
-const PAGE_TITLE = 'Careers | King Bánh Mì';
-const PAGE_DESCRIPTION =
-  'Join the King Banh Mi talent pool. Send your application today and we will reach out when a role that fits opens up.';
-
-export default function CareersPage() {
+function CareersPageContent() {
   const formRef = useRef<CareerFormHandle>(null);
+  const { t } = useCareersLang();
 
   useEffect(() => {
     const previousTitle = document.title;
-    document.title = PAGE_TITLE;
+    document.title = t.meta.title;
 
     let meta = document.querySelector('meta[name="description"]');
     const previousDescription = meta?.getAttribute('content') ?? null;
@@ -23,15 +21,15 @@ export default function CareersPage() {
       meta.setAttribute('name', 'description');
       document.head.appendChild(meta);
     }
-    meta.setAttribute('content', PAGE_DESCRIPTION);
+    meta.setAttribute('content', t.meta.description);
 
     const ogTitle = document.querySelector('meta[property="og:title"]');
     const previousOgTitle = ogTitle?.getAttribute('content') ?? null;
-    ogTitle?.setAttribute('content', PAGE_TITLE);
+    ogTitle?.setAttribute('content', t.meta.title);
 
     const ogDescription = document.querySelector('meta[property="og:description"]');
     const previousOgDescription = ogDescription?.getAttribute('content') ?? null;
-    ogDescription?.setAttribute('content', PAGE_DESCRIPTION);
+    ogDescription?.setAttribute('content', t.meta.description);
 
     return () => {
       document.title = previousTitle;
@@ -49,7 +47,7 @@ export default function CareersPage() {
         ogDescription.setAttribute('content', previousOgDescription);
       }
     };
-  }, []);
+  }, [t.meta.title, t.meta.description]);
 
   return (
     <div className="min-h-screen">
@@ -65,5 +63,13 @@ export default function CareersPage() {
       </main>
       <Footer />
     </div>
+  );
+}
+
+export default function CareersPage() {
+  return (
+    <CareersLangProvider>
+      <CareersPageContent />
+    </CareersLangProvider>
   );
 }
